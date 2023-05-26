@@ -30,6 +30,18 @@ def drawBoard():
     # print(board[0])
 
 
+def left():
+    for i in range(BOARD_SIZE):
+        while 0 in board[i]:
+            board[i].remove(0)
+        idx = 0
+        while (idx+1 < len(board[i])):
+            if board[i][idx] == board[i][idx+1]:
+                board[i][idx] *= 2
+                board[i][idx+1] = 0
+            idx += 1
+        board[i] = board[i] + [0 for i in range(BOARD_SIZE - len(board[i]))]
+
 alive = True
 
 while alive:
@@ -44,26 +56,51 @@ while alive:
 
     m = input()
     if m == 'l':
-        for i in range(BOARD_SIZE):
-            while 0 in board[i]:
-                board[i].remove(0)
-            idx = 0
-            while (idx+1 < len(board[i])):
-                if board[i][idx] == board[i][idx+1]:
-                    board[i][idx] *= 2
-                    board[i][idx+1] = 0
-                idx += 1
-            board[i] = board[i] + \
-                [0 for i in range(BOARD_SIZE - len(board[i]))]
+        left()
     elif m == 'r':
+        # reflect
         for i in range(BOARD_SIZE):
-            while 0 in board[i]:
-                board[i].remove(0)
-            idx = len(board[i])-1
-            while (idx-1 >= 0):
-                if board[i][idx] == board[i][idx-1]:
-                    board[i][idx] *= 2
-                    board[i][idx-1] = 0
-                idx -= 1
-            board[i] = [0 for i in range(
-                BOARD_SIZE - len(board[i]))] + board[i]
+            board[i] = board[i][::-1]
+
+        left()
+        # reflect
+        for i in range(BOARD_SIZE):
+            board[i] = board[i][::-1]
+    elif m == 'u':
+        # rotate ccw
+        tmp = [[0 for i in range(BOARD_SIZE)] for j in range(BOARD_SIZE)]
+        for i in range(BOARD_SIZE):
+            for j in range(BOARD_SIZE):
+                tmp[BOARD_SIZE-1-j][i] = board[i][j]
+        for i in range(BOARD_SIZE):
+            for j in range(BOARD_SIZE):
+                board[i][j] = tmp[i][j]
+        left()
+        # rotate cw
+        tmp = [[0 for i in range(BOARD_SIZE)] for j in range(BOARD_SIZE)]
+        for i in range(BOARD_SIZE):
+            for j in range(BOARD_SIZE):
+                tmp[j][BOARD_SIZE-1-i] = board[i][j]
+        for i in range(BOARD_SIZE):
+            for j in range(BOARD_SIZE):
+                board[i][j] = tmp[i][j]
+    elif m == 'd':
+        # rotate cw
+        tmp = [[0 for i in range(BOARD_SIZE)] for j in range(BOARD_SIZE)]
+        for i in range(BOARD_SIZE):
+            for j in range(BOARD_SIZE):
+                tmp[j][BOARD_SIZE-1-i] = board[i][j]
+        for i in range(BOARD_SIZE):
+            for j in range(BOARD_SIZE):
+                board[i][j] = tmp[i][j]
+        left()
+        # rotate ccw
+        tmp = [[0 for i in range(BOARD_SIZE)] for j in range(BOARD_SIZE)]
+        for i in range(BOARD_SIZE):
+            for j in range(BOARD_SIZE):
+                tmp[BOARD_SIZE-1-j][i] = board[i][j]
+        for i in range(BOARD_SIZE):
+            for j in range(BOARD_SIZE):
+                board[i][j] = tmp[i][j]
+
+
