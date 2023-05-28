@@ -32,15 +32,26 @@ def drawBoard():
 
 def left():
     for i in range(BOARD_SIZE):
-        while 0 in board[i]:
-            board[i].remove(0)
+        cnt = 0
+        for j in range(len(board[i])):
+            if board[i][j] != 0:
+                board[i][cnt] = board[i][j]
+                cnt+=1
+        for j in range(cnt, len(board[i])):
+            board[i][j] = 0
         idx = 0
-        while (idx+1 < len(board[i])):
+        while (idx+1 < cnt):
             if board[i][idx] == board[i][idx+1]:
                 board[i][idx] *= 2
                 board[i][idx+1] = 0
             idx += 1
-        board[i] = board[i] + [0 for i in range(BOARD_SIZE - len(board[i]))]
+        cnt = 0
+        for j in range(len(board[i])):
+            if board[i][j] != 0:
+                board[i][cnt] = board[i][j]
+                cnt+=1
+        for j in range(cnt, len(board[i])):
+            board[i][j] = 0
 
 def reflect():
     for i in range(BOARD_SIZE):
