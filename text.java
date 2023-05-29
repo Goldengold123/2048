@@ -167,7 +167,7 @@ public class text {
             fillRandom(board, ((Math.random() < 0.75) ? 2 : 4));
             drawBoard(board);
             tmpBoard = copyArray(board);
-            while (!moved) {
+            while (alive && !moved) {
                 m = in.next().charAt(0);
                 if (!isAlive(board))
                     alive = false;
