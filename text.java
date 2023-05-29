@@ -2,6 +2,8 @@ import java.util.Scanner;
 
 public class text {
 
+    static boolean moved = false;
+
     public static void fillRandom(int[][] arr, int val) {
         int sx, sy;
         do {
@@ -105,27 +107,82 @@ public class text {
         rotateCCW(arr);
     }
 
+    public static int[][] copyArray(int[][] arr) {
+        int[][] tmpArr = new int[arr.length][arr[0].length];
+        for (int i = 0; i < arr.length; i++)
+            for (int j = 0; j < arr[0].length; j++)
+                tmpArr[i][j] = arr[i][j];
+        return tmpArr;
+    }
+
+    public static boolean sameArray(int[][] arr1, int[][] arr2) {
+        if (arr1.length != arr2.length || arr1[0].length != arr2[0].length)
+            return false;
+        for (int i = 0; i < arr1.length; i++)
+            for (int j = 0; j < arr1[0].length; j++)
+                if (arr1[i][j] != arr2[i][j])
+                    return false;
+        return true;
+    }
+
+    public static boolean isAlive(int[][] arr) {
+        int[][] tmpArr;
+
+        tmpArr = copyArray(arr);
+        left(tmpArr);
+        if (!sameArray(arr, tmpArr))
+            return true;
+
+        tmpArr = copyArray(arr);
+        right(tmpArr);
+        if (!sameArray(arr, tmpArr))
+            return true;
+
+        tmpArr = copyArray(arr);
+        up(tmpArr);
+        if (!sameArray(arr, tmpArr))
+            return true;
+
+        tmpArr = copyArray(arr);
+        down(tmpArr);
+        if (!sameArray(arr, tmpArr))
+            return true;
+
+        return false;
+    }
+
     public static void main(String[] args) {
         Scanner in = new Scanner(System.in);
         boolean alive = true;
         char m;
         int BOARD_SIZE = 4;
         int board[][] = new int[BOARD_SIZE][BOARD_SIZE];
+        int tmpBoard[][];
+        // { { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 4, 0, 0, 0 }, { 8, 8, 2, 2 } };
+
         fillRandom(board, 2);
+
         while (alive) {
+            moved = false;
             fillRandom(board, ((Math.random() < 0.75) ? 2 : 4));
             drawBoard(board);
-            m = in.next().charAt(0);
-            if (m == 'l' || m == 'L')
-                left(board);
-            else if (m == 'r' || m == 'R')
-                right(board);
-            else if (m == 'u' || m == 'U')
-                up(board);
-            else if (m == 'd' || m == 'D')
-                down(board);
-            else if (m == 'q' || m == 'Q')
-                alive = false;
+            tmpBoard = copyArray(board);
+            while (!moved) {
+                m = in.next().charAt(0);
+                if (!isAlive(board))
+                    alive = false;
+                else if (m == 'l' || m == 'L')
+                    left(board);
+                else if (m == 'r' || m == 'R')
+                    right(board);
+                else if (m == 'u' || m == 'U')
+                    up(board);
+                else if (m == 'd' || m == 'D')
+                    down(board);
+                else if (m == 'q' || m == 'Q')
+                    alive = false;
+                moved = !sameArray(board, tmpBoard);
+            }
         }
         in.close();
     }
