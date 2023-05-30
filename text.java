@@ -4,6 +4,7 @@ public class text {
 
     static int winScore = 2048;
     static boolean win = false;
+    static int score = 0;
 
     public static void fillRandom(int[][] arr, int val) {
         int sx, sy;
@@ -40,6 +41,7 @@ public class text {
         cnt = moveZerosToBack(arr);
         for (int i = 0; i + 1 < cnt; i++) {
             if (arr[i] == arr[i + 1]) {
+                score += arr[i];
                 arr[i] *= 2;
                 arr[i + 1] = 0;
             }
@@ -159,7 +161,7 @@ public class text {
         boolean alive = true;
         boolean moved = false;
         boolean asked = false;
-        int BOARD_SIZE = 4;
+        int BOARD_SIZE = 2;
         int board[][] = new int[BOARD_SIZE][BOARD_SIZE];
         int tmpBoard[][];
         char m;
@@ -215,6 +217,7 @@ public class text {
             System.out.println("WIN");
         else
             System.out.println("DEAD");
+        System.out.println("SCORE " + score);
         in.close();
     }
 }
