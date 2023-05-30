@@ -2,7 +2,8 @@ import java.util.Scanner;
 
 public class text {
 
-    static boolean moved = false;
+    static int winScore = 2048;
+    static boolean win = false;
 
     public static void fillRandom(int[][] arr, int val) {
         int sx, sy;
@@ -42,6 +43,8 @@ public class text {
                 arr[i] *= 2;
                 arr[i + 1] = 0;
             }
+            if (arr[i] == winScore)
+                win = true;
         }
         cnt = moveZerosToBack(arr);
     }
@@ -154,24 +157,46 @@ public class text {
     public static void main(String[] args) {
         Scanner in = new Scanner(System.in);
         boolean alive = true;
-        char m;
+        boolean moved = false;
+        boolean asked = false;
         int BOARD_SIZE = 4;
         int board[][] = new int[BOARD_SIZE][BOARD_SIZE];
         int tmpBoard[][];
+        char m;
+
         // { { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 4, 0, 0, 0 }, { 8, 8, 2, 2 } };
+
+        win = false;
 
         fillRandom(board, 2);
 
         while (alive) {
+            if (win && !asked) {
+                asked = true;
+                System.out.println("You reached " + winScore + "! Enter q to quit or p to continue playing.");
+                in.nextLine();
+                while (true) {
+                    m = in.nextLine().charAt(0);
+                    if (m == 'q' || m == 'Q') {
+                        alive = false;
+                        break;
+                    }
+                    if (m == 'p' || m == 'P') {
+                        break;
+                    }
+                }
+            }
             moved = false;
             fillRandom(board, ((Math.random() < 0.75) ? 2 : 4));
             drawBoard(board);
+            if (!isAlive(board))
+                alive = false;
+            if (!alive)
+                break;
             tmpBoard = copyArray(board);
-            while (alive && !moved) {
+            while (!moved) {
                 m = in.next().charAt(0);
-                if (!isAlive(board))
-                    alive = false;
-                else if (m == 'l' || m == 'L')
+                if (m == 'l' || m == 'L')
                     left(board);
                 else if (m == 'r' || m == 'R')
                     right(board);
@@ -179,11 +204,17 @@ public class text {
                     up(board);
                 else if (m == 'd' || m == 'D')
                     down(board);
-                else if (m == 'q' || m == 'Q')
+                else if (m == 'q' || m == 'Q') {
                     alive = false;
+                    break;
+                }
                 moved = !sameArray(board, tmpBoard);
             }
         }
+        if (win)
+            System.out.println("WIN");
+        else
+            System.out.println("DEAD");
         in.close();
     }
 }
