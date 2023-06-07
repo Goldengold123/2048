@@ -32,6 +32,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     // 2 = alive and won, -2 = dead and won
     int state;
     // GameState stateE; [] TO DO
+    boolean moved = false;
+    boolean asdf = true;
 
     public GamePanel() {
         tiles = new Tiles(BOARD_SIZE);
@@ -58,7 +60,17 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
     // call the draw methods in each class to update positions as things move
     public void draw(Graphics g) {
+        g.setFont(new Font("Impact", Font.PLAIN, 32));
+        drawCenteredText(g, "2048", GAME_WIDTH, 200);
         tiles.draw(g);
+    }
+
+    public void drawCenteredText(Graphics g, String s, int x, int y) {
+        int w = (int) g.getFontMetrics().getStringBounds(s, g).getWidth();
+        int h = (int) g.getFontMetrics().getStringBounds(s, g).getHeight();
+        int newX = (x - w) / 2;
+        int newY = (y - h) / 2;
+        g.drawString(s, newX, newY);
     }
 
     // // call the move methods in other classes to update positions
@@ -80,40 +92,52 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         double amountOfTicks = 60;
         double ns = 1000000000 / amountOfTicks;
         double delta = 0;
-        long now;
+        long now = 0;
 
-        while (true) { // this is the infinite game loop
+        gameScreen(lastTime, amountOfTicks, ns, delta, now);
+
+    }
+
+    public void gameScreen(long lastTime, double amountOfTicks, double ns, double delta, long now) {
+        boolean alive = true; // is user alive
+        boolean moved = false; // has user moved (should new board be printed?)
+        boolean asked = false; // user has won, have they been asked whether they want to continue or quit?
+        Tiles tmpBoard; // temporary board to verify if user has moved or not (copy and compare array)
+
+        // Random initial tile
+        tiles.fillRandom(2);
+        while (alive) { // this is the infinite game loop
             now = System.nanoTime();
             delta = delta + (now - lastTime) / ns;
             lastTime = now;
+            moved = true;
 
             // only move objects around and update screen if enough time has passed
             if (delta >= 1) {
-                gameScreen();
+                if (tiles.won() && !asked) { // if user has gotten win tile and not asked if they want to quit/continue,
+                                             // ask
+                    asked = true;
+                }
+                if (moved) {
+                    moved = false;
+                    tiles.fillRandom((Math.random() < 0.75) ? 2 : 4); // fill board with random tile
+                    if (!tiles.isAlive()) // check if user still alive (added tile does not kill them)
+                        alive = false;
+                    if (!alive) // if user dead, break out of game loop
+                        break;
+
+                    // User move
+                    tmpBoard = new Tiles(tiles.getBoard()); // copy array to compare if they actually moved
+                    while (!moved) {
+
+                        moved = !Tiles.sameArray(tiles, tmpBoard); // compare tmpBoard and board to see if user actually
+                                                                   // moved
+                    }
+                }
                 repaint();
                 delta--;
             }
         }
-    }
-
-    public void gameScreen() {
-        if (state == 0)
-            menu();
-        else if (state > 0)
-            game();
-        else
-            end();
-    }
-
-    public void menu() {
-
-    }
-
-    public void game() {
-
-    }
-
-    public void end() {
     }
 
     // if a key is pressed, we'll send it over to the PlayerBall class for
