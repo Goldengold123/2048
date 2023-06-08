@@ -1,14 +1,16 @@
+/*
+ * Author: Grace Pu
+ * Date: May 30
+ * Description: 
+ * Tiles class defines behaviours for the tile (specifically the draw method).
+ * Part of the ALPHA PROGRAM of the ICS4U final culminating project.
+ */
 
-/* PlayerBall class defines behaviours for the player-controlled ball  
-
-child of Rectangle because that makes it easy to draw and check for collision
-
-In 2D GUI, basically everything is a rectangle even if it doesn't look like it!
-*/
 import java.awt.*;
 
-public class Tile extends Rectangle {
+public class Tile {
 
+    // Colours of tiles array
     public static final Color[] colours = {
             new Color(205, 193, 180),
             new Color(238, 228, 218),
@@ -25,11 +27,12 @@ public class Tile extends Rectangle {
             new Color(60, 58, 50)
     };
 
-    // constructor creates ball at given location with given dimensions
+    // constructor, not actually used since draw method is static
     public Tile() {
 
     }
 
+    // draws centered text
     public static void drawCenteredText(Graphics g, String s, int x, int y) {
         int w = (int) g.getFontMetrics().getStringBounds(s, g).getWidth();
         int h = (int) g.getFontMetrics().getStringBounds(s, g).getHeight();
@@ -40,7 +43,7 @@ public class Tile extends Rectangle {
     }
 
     // called frequently from the GamePanel class
-    // draws the current location of the ball to the screen
+    // draws the tile to the screen
     public static void draw(Graphics g, int n, int x, int y, int SIZE) {
         g.setColor(colours[(n == 0) ? 0 : Math.min(12, (int) (Math.log10(n) / Math.log10(2)))]);
         g.fillRoundRect(x, y, SIZE, SIZE, SIZE / 3, SIZE / 3);

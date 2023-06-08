@@ -16,33 +16,26 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     // Variable Declaration
 
     // dimensions of window
-    public static final int GAME_WIDTH = 600;
-    public static final int GAME_HEIGHT = 600;
-
-    int startX = 20;
-    int startY = 160;
+    private static final int GAME_WIDTH = 600;
+    private static final int GAME_HEIGHT = 600;
 
     private int BOARD_SIZE = 4;
 
-    public Thread gameThread;
-    public Image image;
-    public Graphics graphics;
+    private Thread gameThread;
+    private Image image;
+    private Graphics graphics;
 
-    public Tiles tiles;
-    public Text timer;
-    public Text score;
-    public Text highscore;
+    private Tiles tiles;
 
     // integer to store game state
     // 0 = menu
     // 1 = game
     // 2 = end
-    int state = 1;
+    private int state = 1;
 
     public GamePanel() {
-        tiles = new Tiles(BOARD_SIZE, startX, startY, GAME_WIDTH / (BOARD_SIZE + 2) * 9 / 10);
-        timer = new Text(startX + tiles.TILE_SIZE * 10 / 9 * BOARD_SIZE + tiles.TILE_SIZE / 9, startY, 200,
-                tiles.TILE_SIZE / 2, 10, new Color(52, 44, 37));
+        tiles = new Tiles(BOARD_SIZE, 100, 160, GAME_WIDTH / (BOARD_SIZE + 2) * 9 / 10);
+
         this.setFocusable(true); // make everything in this class appear on the screen
         this.addKeyListener(this); // start listening for keyboard input
         this.setPreferredSize(new Dimension(GAME_WIDTH, GAME_HEIGHT));
@@ -65,12 +58,15 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     }
 
     // call the draw methods in each class to update positions as things move
-    public void draw(Graphics g) {
+    private void draw(Graphics g) {
         if (state == 1)
             drawGame(g);
+        else
+            drawEnd(g);
     }
 
-    public void drawCenteredText(Graphics g, String s, int x, int y) {
+    // draws centered text based on string and (x,y) center point
+    private void drawCenteredText(Graphics g, String s, int x, int y) {
         int w = (int) g.getFontMetrics().getStringBounds(s, g).getWidth();
         int h = (int) g.getFontMetrics().getStringBounds(s, g).getHeight();
         int newX = (x - w) / 2;
@@ -78,11 +74,25 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         g.drawString(s, newX, newY);
     }
 
-    public void drawGame(Graphics g) {
+    private void drawGame(Graphics g) {
         g.setFont(new Font("Impact", Font.PLAIN, 96));
         drawCenteredText(g, "2048", GAME_WIDTH, 360);
         tiles.draw(g);
-        timer.draw(g);
+    }
+
+    public void drawEnd(Graphics g) {
+        g.setFont(new Font("Impact", Font.PLAIN, 96));
+        drawCenteredText(g, "End", GAME_WIDTH, 360);
+        g.setFont(new Font("Impact", Font.PLAIN, 32));
+
+        // Basic end conditions
+        if (tiles.won()) // user has won
+            drawCenteredText(g, "Win", GAME_WIDTH, 500);
+
+        else // user has lost
+            drawCenteredText(g, "Dead", GAME_WIDTH, 500);
+
+        drawCenteredText(g, "Score " + tiles.getScore(), GAME_WIDTH, 600); // score
     }
 
     // run() method is what makes the game continue running without end. It calls
@@ -102,8 +112,9 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     }
 
     // Infinite game loop
-    public void gameScreen(long lastTime, double amountOfTicks, double ns, double delta, long now) {
+    private void gameScreen(long lastTime, double amountOfTicks, double ns, double delta, long now) {
         boolean responded = false; // has user responded (should new board be printed?)
+
         boolean asked = false; // user has won, have they been asked whether they want to continue or quit?
         Tiles tmpBoard; // temporary board to verify if user has moved or not (copy and compare array)
 
@@ -111,7 +122,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         tiles.fillRandom(2);
 
         // Main game loop
-        while (state > 0) {
+        while (state == 1) {
             now = System.nanoTime();
             delta = delta + (now - lastTime) / ns;
             lastTime = now;
@@ -139,27 +150,15 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
             repaint();
             delta--;
         }
-
-        System.out.println("ok");
-        // Basic end conditions
-        if (tiles.won()) // user has won
-            System.out.println("WIN");
-        else // user has lost
-            System.out.println("DEAD");
-        System.out.println("SCORE " + tiles.getScore()); // score
     }
 
-    // if a key is pressed, we'll send it over to the PlayerBall class for
-    // processing
+    // if a key is pressed, send to tiles class to process
+    @Override
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_Q)
-            state = 2;
-        else
-            tiles.keyPressed(e);
+        tiles.keyPressed(e);
     }
 
-    // left empty because we don't need it; must be here because it is required to
-    // be overridded by the KeyListener interface
+    @Override
     public void keyTyped(KeyEvent e) {
 
     }

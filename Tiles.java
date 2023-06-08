@@ -18,8 +18,8 @@ public class Tiles {
 
     public int TILE_SIZE;
 
-    int startX;
-    int startY;
+    private int startX;
+    private int startY;
 
     // Main constructor
     public Tiles(int size, int x, int y, int s) {
@@ -246,9 +246,7 @@ public class Tiles {
     }
 
     // called from GamePanel when any keyboard input is detected
-    // updates the direction of the ball based on user input
-    // if the keyboard input isn't any of the options (d, a, w, s), then nothing
-    // happens
+    // slides the tiles in the direction if arrow keys pressed
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_LEFT)
             left();
@@ -261,7 +259,7 @@ public class Tiles {
     }
 
     // called frequently from the GamePanel class
-    // draws the current location of the ball to the screen
+    // draws tiles to the screen
     public void draw(Graphics g) {
         g.setColor(new Color(52, 44, 37));
         g.fillRoundRect(startX, startY, board[0].length * TILE_SIZE * 11 / 10 + TILE_SIZE / 10,
