@@ -6,18 +6,12 @@
  * Part of the ALPHA PROGRAM of the ICS4U final culminating project.
  */
 
-import java.awt.*;
-import java.awt.event.*;
-
 public class Tiles {
     // Variable declaration
     private int[][] board;
     private int score;
     private boolean win;
     private static int winScore = 2048;
-
-    int startX = 105;
-    int startY = 160;
 
     // Main constructor
     public Tiles(int size) {
@@ -180,7 +174,7 @@ public class Tiles {
     }
 
     // Method to check if 2 arrays are identical (same elements in the same order).
-    static boolean sameArray(Tiles tiles1, Tiles tiles2) {
+    public static boolean sameArray(Tiles tiles1, Tiles tiles2) {
         int[][] arr1 = tiles1.board;
         int[][] arr2 = tiles2.board;
 
@@ -240,41 +234,13 @@ public class Tiles {
         return win;
     }
 
-    // called from GamePanel when any keyboard input is detected
-    // updates the direction of the ball based on user input
-    // if the keyboard input isn't any of the options (d, a, w, s), then nothing
-    // happens
-    public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_LEFT)
-            left();
-        if (e.getKeyCode() == KeyEvent.VK_RIGHT)
-            right();
-        if (e.getKeyCode() == KeyEvent.VK_UP)
-            up();
-        if (e.getKeyCode() == KeyEvent.VK_DOWN)
-            down();
-    }
-
-    // // Method for printing the board array.
-    // public void draw() {
-    // for (int[] line : board) {
-    // for (int cell : line)
-    // System.out.print(cell + " ".repeat(6 - (cell + "").length()));
-    // System.out.println();
-    // }
-    // System.out.println();
-    // }
-
-    // called frequently from the GamePanel class
-    // draws the current location of the ball to the screen
-    public void draw(Graphics g) {
-        int cell;
-        g.setColor(Color.black);
-        for (int i = 0; i < board.length; i++) {
-            for (int j = 0; j < board[0].length; j++) {
-                cell = board[i][j];
-                Tile.draw(g, cell, startX + j * Tile.SIZE * 11 / 10, startY + i * Tile.SIZE * 11 / 10);
-            }
+    // Method for printing the board array.
+    public void draw() {
+        for (int[] line : board) {
+            for (int cell : line)
+                System.out.print(cell + " ".repeat(6 - (cell + "").length()));
+            System.out.println();
         }
+        System.out.println();
     }
 }

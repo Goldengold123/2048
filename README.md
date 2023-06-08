@@ -1,4 +1,4 @@
-# 2048
+# 2048 ALPHA
 
 ## Conventions / Formatting Explanations
 
@@ -10,5 +10,5 @@ Double click the batch file [runMe.bat](runMe.bat).
 
 ## Gameplay
 
-To move, enter one of the following characters: l, r, u, d. These correspond to sliding to the left, right, up, and down, respectively.
+To move, enter one of the following characters: l, r, u, d. These correspond to sliding to the left, right, up, and down, respectively. Invalid moves will be ignored (no feedback since this is only ALPHA program).
 To quit, enter q.
