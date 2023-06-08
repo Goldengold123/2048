@@ -17,24 +17,32 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
     // dimensions of window
     public static final int GAME_WIDTH = 600;
-    public static final int GAME_HEIGHT = 700;
+    public static final int GAME_HEIGHT = 600;
+
+    int startX = 20;
+    int startY = 160;
 
     private int BOARD_SIZE = 4;
 
     public Thread gameThread;
     public Image image;
     public Graphics graphics;
+
     public Tiles tiles;
+    public Text timer;
+    public Text score;
+    public Text highscore;
 
     // integer to store game state
     // 0 = menu
     // 1 = game
     // 2 = end
     int state = 1;
-    // GameState stateE; [] TO DO
 
     public GamePanel() {
-        tiles = new Tiles(BOARD_SIZE);
+        tiles = new Tiles(BOARD_SIZE, startX, startY, GAME_WIDTH / (BOARD_SIZE + 2) * 9 / 10);
+        timer = new Text(startX + tiles.TILE_SIZE * 10 / 9 * BOARD_SIZE + tiles.TILE_SIZE / 9, startY, 200,
+                tiles.TILE_SIZE / 2, 10, new Color(52, 44, 37));
         this.setFocusable(true); // make everything in this class appear on the screen
         this.addKeyListener(this); // start listening for keyboard input
         this.setPreferredSize(new Dimension(GAME_WIDTH, GAME_HEIGHT));
@@ -58,9 +66,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
     // call the draw methods in each class to update positions as things move
     public void draw(Graphics g) {
-        g.setFont(new Font("Impact", Font.PLAIN, 32));
-        drawCenteredText(g, "2048", GAME_WIDTH, 200);
-        tiles.draw(g);
+        if (state == 1)
+            drawGame(g);
     }
 
     public void drawCenteredText(Graphics g, String s, int x, int y) {
@@ -69,6 +76,13 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         int newX = (x - w) / 2;
         int newY = (y - h) / 2;
         g.drawString(s, newX, newY);
+    }
+
+    public void drawGame(Graphics g) {
+        g.setFont(new Font("Impact", Font.PLAIN, 96));
+        drawCenteredText(g, "2048", GAME_WIDTH, 360);
+        tiles.draw(g);
+        timer.draw(g);
     }
 
     // run() method is what makes the game continue running without end. It calls
@@ -119,11 +133,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
             // User move
             tmpBoard = new Tiles(tiles.getBoard()); // copy array to compare if they actually moved
-            while (!responded) {
-                System.out.println("yay");
+            while (!responded)
                 responded = !Tiles.sameArray(tiles, tmpBoard); // compare tmpBoard and board to see if actually moved
-            }
-            System.out.println("nay");
 
             repaint();
             delta--;

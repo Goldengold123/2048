@@ -16,14 +16,19 @@ public class Tiles {
     private boolean win;
     private static int winScore = 2048;
 
-    int startX = 105;
-    int startY = 160;
+    public int TILE_SIZE;
+
+    int startX;
+    int startY;
 
     // Main constructor
-    public Tiles(int size) {
+    public Tiles(int size, int x, int y, int s) {
         board = new int[size][size];
         score = 0;
         win = false;
+        startX = x;
+        startY = y;
+        TILE_SIZE = s;
     }
 
     // Constructor for copying Tiles, used to check if moves valid
@@ -258,12 +263,13 @@ public class Tiles {
     // called frequently from the GamePanel class
     // draws the current location of the ball to the screen
     public void draw(Graphics g) {
-        int cell;
-        g.setColor(Color.black);
+        g.setColor(new Color(52, 44, 37));
+        g.fillRoundRect(startX, startY, board[0].length * TILE_SIZE * 11 / 10 + TILE_SIZE / 10,
+                board.length * TILE_SIZE * 11 / 10 + TILE_SIZE / 10, TILE_SIZE / 4, TILE_SIZE / 4);
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[0].length; j++) {
-                cell = board[i][j];
-                Tile.draw(g, cell, startX + j * Tile.SIZE * 11 / 10, startY + i * Tile.SIZE * 11 / 10);
+                Tile.draw(g, board[i][j], startX + TILE_SIZE / 10 + j * TILE_SIZE * 11 / 10,
+                        startY + TILE_SIZE / 10 + i * TILE_SIZE * 11 / 10, TILE_SIZE);
             }
         }
     }
