@@ -10,7 +10,26 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class Tiles {
+
     // Variable declaration
+
+    // Colours of tiles array
+    public static final Color[] colours = {
+            new Color(205, 193, 180),
+            new Color(238, 228, 218),
+            new Color(237, 224, 200),
+            new Color(242, 177, 121),
+            new Color(245, 149, 99),
+            new Color(246, 124, 95),
+            new Color(246, 94, 59),
+            new Color(237, 207, 114),
+            new Color(237, 204, 97),
+            new Color(237, 200, 80),
+            new Color(237, 197, 63),
+            new Color(237, 194, 46),
+            new Color(60, 58, 50)
+    };
+
     private int[][] board;
     private int score;
     private boolean win;
@@ -88,9 +107,9 @@ public class Tiles {
         // PART 2 - combine adjacent tiles if they are identical
         for (int i = 0; i + 1 < cnt; i++) {
             if (arr[i] == arr[i + 1]) { // if adjacent tiles are the same, combine them
-                s += arr[i];
                 arr[i] *= 2; // set one tile to combined value
                 arr[i + 1] = 0; // set other tile to 0 (empty tile)
+                s += arr[i];
             }
             if (arr[i] == winScore) // if winScore obtained, set win to true
                 win = true;
@@ -258,6 +277,26 @@ public class Tiles {
             down();
     }
 
+    // draws centered text
+    public static void drawCenteredText(Graphics g, String s, int x, int y) {
+        int w = (int) g.getFontMetrics().getStringBounds(s, g).getWidth();
+        int h = (int) g.getFontMetrics().getStringBounds(s, g).getHeight();
+        int newX = x - w / 2;
+        int newY = y + h / 2;
+
+        g.drawString(s, newX, newY);
+    }
+
+    // draws the tile to the screen
+    public static void drawTile(Graphics g, int n, int x, int y, int SIZE) {
+        g.setColor(colours[(n == 0) ? 0 : Math.min(12, (int) (Math.log10(n) / Math.log10(2)))]);
+        g.fillRoundRect(x, y, SIZE, SIZE, SIZE / 3, SIZE / 3);
+        g.setColor((n <= 4) ? new Color(119, 110, 101) : new Color(249, 246, 242));
+        g.setFont(new Font("Impact", Font.PLAIN, 32));
+        if (n != 0)
+            drawCenteredText(g, n + "", x + SIZE / 2, y + SIZE / 2);
+    }
+
     // called frequently from the GamePanel class
     // draws tiles to the screen
     public void draw(Graphics g) {
@@ -266,7 +305,7 @@ public class Tiles {
                 board.length * TILE_SIZE * 11 / 10 + TILE_SIZE / 10, TILE_SIZE / 4, TILE_SIZE / 4);
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[0].length; j++) {
-                Tile.draw(g, board[i][j], startX + TILE_SIZE / 10 + j * TILE_SIZE * 11 / 10,
+                drawTile(g, board[i][j], startX + TILE_SIZE / 10 + j * TILE_SIZE * 11 / 10,
                         startY + TILE_SIZE / 10 + i * TILE_SIZE * 11 / 10, TILE_SIZE);
             }
         }

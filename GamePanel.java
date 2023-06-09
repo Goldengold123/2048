@@ -26,6 +26,9 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     private Graphics graphics;
 
     private Tiles tiles;
+    private Text timer;
+    private Text score;
+    private Text highscore;
 
     // integer to store game state
     // 0 = menu
@@ -34,7 +37,13 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     private int state = 1;
 
     public GamePanel() {
-        tiles = new Tiles(BOARD_SIZE, 100, 160, GAME_WIDTH / (BOARD_SIZE + 2) * 9 / 10);
+        tiles = new Tiles(BOARD_SIZE, 25, 160, 90);
+        timer = new Text(450, 160, 125, 50, 20, new Color(187, 173, 160), new Color(206, 208, 207),
+                new Color(250, 248, 239), "TIMER", 2);
+        score = new Text(450, 240, 125, 50, 20, new Color(187, 173, 160), new Color(206, 208, 207),
+                new Color(250, 248, 239), "SCORE", 0);
+        highscore = new Text(450, 320, 125, 50, 20, new Color(187, 173, 160), new Color(206, 208, 207),
+                new Color(250, 248, 239), "HIGHSCORE", 0);
 
         this.setFocusable(true); // make everything in this class appear on the screen
         this.addKeyListener(this); // start listening for keyboard input
@@ -78,6 +87,9 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         g.setFont(new Font("Impact", Font.PLAIN, 96));
         drawCenteredText(g, "2048", GAME_WIDTH, 360);
         tiles.draw(g);
+        timer.draw(g);
+        score.draw(g);
+        highscore.draw(g);
     }
 
     public void drawEnd(Graphics g) {
@@ -126,7 +138,10 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
             now = System.nanoTime();
             delta = delta + (now - lastTime) / ns;
             lastTime = now;
+
             responded = true;
+            score.value = tiles.getScore();
+
             if (tiles.won() && !asked) { // if user has gotten win tile and not asked if they want to quit/continue, ask
                 asked = true;
                 System.out.println("hmm.");
