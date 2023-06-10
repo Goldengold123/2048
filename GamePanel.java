@@ -26,6 +26,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     private Graphics graphics;
 
     private Tiles tiles;
+    private Stopwatch stopwatch;
     private Text timer;
     private Text score;
     private Text highscore;
@@ -40,6 +41,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         tiles = new Tiles(BOARD_SIZE, 25, 160, 90);
         timer = new Text(450, 160, 125, 50, 20, new Color(187, 173, 160), new Color(206, 208, 207),
                 new Color(250, 248, 239), "TIMER", 2);
+        stopwatch = new Stopwatch();
         score = new Text(450, 240, 125, 50, 20, new Color(187, 173, 160), new Color(206, 208, 207),
                 new Color(250, 248, 239), "SCORE", 0);
         highscore = new Text(450, 320, 125, 50, 20, new Color(187, 173, 160), new Color(206, 208, 207),
@@ -159,10 +161,13 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
             // User move
             tmpBoard = new Tiles(tiles.getBoard()); // copy array to compare if they actually moved
-            while (!responded)
+            while (!responded) {
                 responded = !Tiles.sameArray(tiles, tmpBoard); // compare tmpBoard and board to see if actually moved
 
-            repaint();
+                stopwatch.update();
+                timer.value = stopwatch.getElapsed();
+                repaint();
+            }
             delta--;
         }
     }
