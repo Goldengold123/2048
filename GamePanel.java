@@ -7,6 +7,11 @@
  * It continuously runs the game and calls whatever needs to be called through the run() method.
  */
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.Scanner;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -30,6 +35,9 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     private Text timer;
     private Text score;
     private Text highscore;
+    private int high = 0;
+    private Button restart;
+    private Button menu;
 
     // integer to store game state
     // 0 = menu
@@ -37,16 +45,57 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     // 2 = end
     private int state = 1;
 
-    public GamePanel() {
-        tiles = new Tiles(BOARD_SIZE, 25, 160, 90);
-        timer = new Text(450, 160, 125, 50, 20, new Color(187, 173, 160), new Color(206, 208, 207),
-                new Color(250, 248, 239), "TIMER", 2);
-        stopwatch = new Stopwatch();
-        score = new Text(450, 240, 125, 50, 20, new Color(187, 173, 160), new Color(206, 208, 207),
-                new Color(250, 248, 239), "SCORE", 0);
-        highscore = new Text(450, 320, 125, 50, 20, new Color(187, 173, 160), new Color(206, 208, 207),
-                new Color(250, 248, 239), "HIGHSCORE", 0);
+    boolean responded = false; // has user responded (should new board be printed?)
+    boolean asked = false; // user has won, have they been asked whether they want to continue or quit?
 
+    public GamePanel() {
+        File hs;
+        Scanner reader;
+
+        // Tiles board
+        tiles = new Tiles(BOARD_SIZE, 25, 160, 90);
+
+        // Stopwatch / timer
+        timer = new Text(450, 160, "TIMER", 2, false);
+        stopwatch = new Stopwatch();
+
+        // Score
+        score = new Text(450, 240, "SCORE", 0, true);
+
+        // Highscore
+        highscore = new Text(450, 320, "HIGHSCORE", 0, true);
+        try {
+            hs = new File("highscore.txt");
+            reader = new Scanner(hs);
+            high = Integer.parseInt(reader.nextLine());
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        highscore.value = high;
+
+        // Restart
+        restart = new Button(450, 435, "RESTART");
+
+        // Menu
+        menu = new Button(450, 515, "MENU");
+
+        // Mouse Click
+        addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                if (restart.checkMouse(e.getX(), e.getY())) {
+                    restart();
+                    // Repaint the panel
+                    repaint();
+                }
+                if (menu.checkMouse(e.getX(), e.getY())) {
+                    state = 0;
+                    repaint();
+                }
+            }
+        });
+
+        // breh
         this.setFocusable(true); // make everything in this class appear on the screen
         this.addKeyListener(this); // start listening for keyboard input
         this.setPreferredSize(new Dimension(GAME_WIDTH, GAME_HEIGHT));
@@ -65,12 +114,13 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         graphics = image.getGraphics();
         draw(graphics);// update the positions of everything on the screen
         g.drawImage(image, 0, 0, this); // move the image on the screen
-
     }
 
     // call the draw methods in each class to update positions as things move
     private void draw(Graphics g) {
-        if (state == 1)
+        if (state == 0)
+            drawMenu(g);
+        else if (state == 1)
             drawGame(g);
         else
             drawEnd(g);
@@ -85,6 +135,10 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         g.drawString(s, newX, newY);
     }
 
+    private void drawMenu(Graphics g) {
+
+    }
+
     private void drawGame(Graphics g) {
         g.setFont(new Font("Impact", Font.PLAIN, 96));
         drawCenteredText(g, "2048", GAME_WIDTH, 360);
@@ -92,6 +146,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         timer.draw(g);
         score.draw(g);
         highscore.draw(g);
+        restart.draw(g);
+        menu.draw(g);
     }
 
     public void drawEnd(Graphics g) {
@@ -109,9 +165,22 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         drawCenteredText(g, "Score " + tiles.getScore(), GAME_WIDTH, 600); // score
     }
 
+    public void updateHighScore() {
+        PrintWriter writer;
+        try {
+            writer = new PrintWriter("highscore.txt", "UTF-8");
+            writer.println(high);
+            writer.close();
+        } catch (FileNotFoundException | UnsupportedEncodingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
     // run() method is what makes the game continue running without end. It calls
     // other methods to move objects, check for collision, and update the screen
     public void run() {
+
         // the CPU runs our game code too quickly - we need to slow it down! The
         // following lines of code "force" the computer to get stuck in a loop for short
         // intervals between calling other methods to update the screen.
@@ -123,18 +192,13 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
         gameScreen(lastTime, amountOfTicks, ns, delta, now);
 
+        updateHighScore();
     }
 
     // Infinite game loop
     private void gameScreen(long lastTime, double amountOfTicks, double ns, double delta, long now) {
-        boolean responded = false; // has user responded (should new board be printed?)
-
-        boolean asked = false; // user has won, have they been asked whether they want to continue or quit?
         Tiles tmpBoard; // temporary board to verify if user has moved or not (copy and compare array)
-
-        // Random initial tile
-        tiles.fillRandom(2);
-
+        restart();
         // Main game loop
         while (state == 1) {
             now = System.nanoTime();
@@ -142,7 +206,6 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
             lastTime = now;
 
             responded = true;
-            score.value = tiles.getScore();
 
             if (tiles.won() && !asked) { // if user has gotten win tile and not asked if they want to quit/continue, ask
                 asked = true;
@@ -166,10 +229,26 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
                 stopwatch.update();
                 timer.value = stopwatch.getElapsed();
+
+                score.value = tiles.getScore();
+                high = Math.max(high, tiles.getScore());
+                highscore.value = high;
+
                 repaint();
             }
             delta--;
         }
+    }
+
+    public void restart() {
+        // Reset game variables
+        tiles.restart();
+        stopwatch.restart();
+        highscore.value = Math.max(high, highscore.value);
+        state = 1;
+
+        // Random initial tile
+        tiles.fillRandom(2);
     }
 
     // if a key is pressed, send to tiles class to process
@@ -186,4 +265,5 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     @Override
     public void keyReleased(KeyEvent e) {
     }
+
 }

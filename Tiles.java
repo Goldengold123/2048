@@ -58,6 +58,13 @@ public class Tiles {
                 board[i][j] = old[i][j];
     }
 
+    // Method for restarting tiles
+    public void restart() {
+        board = new int[board.length][board.length];
+        score = 0;
+        win = false;
+    }
+
     // Method for filling random unfilled (value is 0) element of a 2D array with n.
     public void fillRandom(int n) {
         int sx, sy;
