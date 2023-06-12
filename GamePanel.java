@@ -50,8 +50,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     // 2 = end
     private int state = 0;
 
-    boolean responded = false; // has user responded (should new board be printed?)
-    boolean asked = false; // user has won, have they been asked whether they want to continue or quit?
+    private boolean responded = false; // has user responded (should new board be printed?)
+    private boolean asked = false; // user has won, have they been asked whether they want to continue or quit?
 
     public GamePanel() {
         File hs;
@@ -147,7 +147,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     // call the draw methods in each class to update positions as things move
     private void draw(Graphics g) {
         if (state == 0)
-            drawMenu(g);
+            drawTitle(g);
         else if (state == 1)
             drawGame(g);
         else if (state == 2)
@@ -165,7 +165,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         g.drawString(s, newX, newY);
     }
 
-    private void drawMenu(Graphics g) {
+    private void drawTitle(Graphics g) {
         g.setFont(new Font("Impact", Font.PLAIN, 120));
         drawCenteredText(g, "2048", GAME_WIDTH / 2, 240);
         highscore.x = 520;
@@ -196,7 +196,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         menu.draw(g);
     }
 
-    public void drawEnd(Graphics g) {
+    private void drawEnd(Graphics g) {
         g.setFont(new Font("Impact", Font.PLAIN, 120));
         drawCenteredText(g, "2048", GAME_WIDTH / 2, 240);
         g.setFont(new Font("Impact", Font.PLAIN, 32));
@@ -211,8 +211,9 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         drawCenteredText(g, "Score " + tiles.getScore(), GAME_WIDTH / 2, 300); // score
     }
 
-    public void updateHighScore() {
+    private void updateHighScore() {
         PrintWriter writer;
+        high = Math.max(high, tiles.getScore());
         try {
             writer = new PrintWriter("highscore.txt", "UTF-8");
             writer.println(high);
@@ -257,7 +258,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
                     }
                 }
                 responded = false;
-                tiles.fillRandom((Math.random() < 0.75) ? 2 : 4); // fill board with random tile
+                tiles.fillRandom((Math.random() < 0.9) ? 2 : 4); // fill board with random tile
                 if (!tiles.isAlive()) // check if user still alive (added tile does not kill them)
                     state = -1 * Math.abs(state);
                 if (state < 0) // if user dead, break out of game loop
@@ -273,7 +274,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
                     timer.value = stopwatch.getElapsed();
 
                     score.value = tiles.getScore();
-                    high = Math.max(high, tiles.getScore());
+                    updateHighScore();
                     highscore.value = high;
 
                     repaint();
