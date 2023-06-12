@@ -31,6 +31,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     private Graphics graphics;
 
     private Tiles tiles;
+
     private Stopwatch stopwatch;
     private Text timer;
     private Text score;
@@ -39,11 +40,15 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     private Button restart;
     private Button menu;
 
+    private Button play;
+    private Button instructions;
+    private Button quit;
+
     // integer to store game state
     // 0 = menu
     // 1 = game
     // 2 = end
-    private int state = 1;
+    private int state = 0;
 
     boolean responded = false; // has user responded (should new board be printed?)
     boolean asked = false; // user has won, have they been asked whether they want to continue or quit?
@@ -56,14 +61,14 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         tiles = new Tiles(BOARD_SIZE, 25, 160, 90);
 
         // Stopwatch / timer
-        timer = new Text(450, 160, "TIMER", 2, false);
+        timer = new Text(500, 185, "TIMER", 2, false);
         stopwatch = new Stopwatch();
 
         // Score
-        score = new Text(450, 240, "SCORE", 0, true);
+        score = new Text(500, 245, "SCORE", 0, true);
 
         // Highscore
-        highscore = new Text(450, 320, "HIGHSCORE", 0, true);
+        highscore = new Text(600, 240, "HIGHSCORE", 0, true);
         try {
             hs = new File("highscore.txt");
             reader = new Scanner(hs);
@@ -75,23 +80,45 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         highscore.value = high;
 
         // Restart
-        restart = new Button(450, 435, "RESTART");
+        restart = new Button(500, 480, "RESTART");
 
         // Menu
-        menu = new Button(450, 515, "MENU");
+        menu = new Button(500, 540, "MENU");
+
+        // Play
+        play = new Button(GAME_WIDTH / 2, 260, "PLAY");
+
+        // Instructions
+        instructions = new Button(GAME_WIDTH / 2, 330, "INSTRUCTIONS");
+
+        // Quit
+        quit = new Button(GAME_WIDTH / 2, 400, "QUIT");
 
         // Mouse Click
         addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
-                if (restart.checkMouse(e.getX(), e.getY())) {
-                    restart();
-                    // Repaint the panel
-                    repaint();
+                if (state == 0) {
+                    if (play.checkMouse(e.getX(), e.getY())) {
+                        state = 1;
+                    } else if (instructions.checkMouse(e.getX(), e.getY())) {
+                        state = -1;
+                    } else if (quit.checkMouse(e.getX(), e.getY())) {
+
+                    }
+
+                } else if (state == 1) {
+                    if (restart.checkMouse(e.getX(), e.getY())) {
+                        restart();
+                        // Repaint the panel
+                        repaint();
+                    } else if (menu.checkMouse(e.getX(), e.getY())) {
+                        restart();
+                        state = 0;
+                        repaint();
+                    }
                 }
-                if (menu.checkMouse(e.getX(), e.getY())) {
-                    state = 0;
-                    repaint();
-                }
+                repaint();
+
             }
         });
 
@@ -122,6 +149,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
             drawMenu(g);
         else if (state == 1)
             drawGame(g);
+        else if (state == -1)
+            drawInstructions(g);
         else
             drawEnd(g);
     }
@@ -130,39 +159,55 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     private void drawCenteredText(Graphics g, String s, int x, int y) {
         int w = (int) g.getFontMetrics().getStringBounds(s, g).getWidth();
         int h = (int) g.getFontMetrics().getStringBounds(s, g).getHeight();
-        int newX = (x - w) / 2;
-        int newY = (y - h) / 2;
+        int newX = x - w / 2;
+        int newY = y - h / 2;
         g.drawString(s, newX, newY);
     }
 
     private void drawMenu(Graphics g) {
+        g.setFont(new Font("Impact", Font.PLAIN, 120));
+        drawCenteredText(g, "2048", GAME_WIDTH / 2, 240);
+        highscore.x = 520;
+        highscore.y = 120;
+        highscore.draw(g);
+        play.draw(g);
+        instructions.draw(g);
+        quit.draw(g);
+    }
 
+    private void drawInstructions(Graphics g) {
+        g.setFont(new Font("Impact", Font.PLAIN, 120));
+        drawCenteredText(g, "2048", GAME_WIDTH / 2, 240);
+        g.setFont(new Font("Impact", Font.PLAIN, 32));
+        drawCenteredText(g, "asdkfasd", GAME_WIDTH / 2, 250);
     }
 
     private void drawGame(Graphics g) {
         g.setFont(new Font("Impact", Font.PLAIN, 96));
-        drawCenteredText(g, "2048", GAME_WIDTH, 360);
+        drawCenteredText(g, "2048", GAME_WIDTH / 2, 180);
         tiles.draw(g);
         timer.draw(g);
         score.draw(g);
+        highscore.x = 500;
+        highscore.y = 305;
         highscore.draw(g);
         restart.draw(g);
         menu.draw(g);
     }
 
     public void drawEnd(Graphics g) {
-        g.setFont(new Font("Impact", Font.PLAIN, 96));
-        drawCenteredText(g, "End", GAME_WIDTH, 360);
+        g.setFont(new Font("Impact", Font.PLAIN, 120));
+        drawCenteredText(g, "2048", GAME_WIDTH / 2, 240);
         g.setFont(new Font("Impact", Font.PLAIN, 32));
 
         // Basic end conditions
         if (tiles.won()) // user has won
-            drawCenteredText(g, "Win", GAME_WIDTH, 500);
+            drawCenteredText(g, "Win", GAME_WIDTH / 2, 250);
 
         else // user has lost
-            drawCenteredText(g, "Dead", GAME_WIDTH, 500);
+            drawCenteredText(g, "Dead", GAME_WIDTH / 2, 250);
 
-        drawCenteredText(g, "Score " + tiles.getScore(), GAME_WIDTH, 600); // score
+        drawCenteredText(g, "Score " + tiles.getScore(), GAME_WIDTH / 2, 300); // score
     }
 
     public void updateHighScore() {
@@ -190,9 +235,12 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         double delta = 0;
         long now = 0;
 
-        gameScreen(lastTime, amountOfTicks, ns, delta, now);
+        while (true) {
+            if (state == 1)
+                gameScreen(lastTime, amountOfTicks, ns, delta, now);
 
-        updateHighScore();
+            updateHighScore();
+        }
     }
 
     // Infinite game loop
@@ -206,7 +254,6 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
             lastTime = now;
 
             responded = true;
-
             if (tiles.won() && !asked) { // if user has gotten win tile and not asked if they want to quit/continue, ask
                 asked = true;
                 System.out.println("hmm.");

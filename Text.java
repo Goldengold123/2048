@@ -19,11 +19,11 @@ public class Text extends Rectangle {
 
     // draws centered text
 
-    private static void drawCenteredText(Graphics g, String s, int x, int y) {
+    private void drawCenteredText(Graphics g, String s, int x, int y) {
         int w = (int) g.getFontMetrics().getStringBounds(s, g).getWidth();
         int h = (int) g.getFontMetrics().getStringBounds(s, g).getHeight();
-        int newX = x - w / 2;
-        int newY = y + h / 2;
+        int newX = x - width / 2 - w / 2;
+        int newY = y - height / 2 + h / 2;
 
         g.drawString(s, newX, newY);
     }
@@ -32,7 +32,7 @@ public class Text extends Rectangle {
     // draws the current location of the ball to the screen
     public void draw(Graphics g) {
         g.setColor(colour);
-        g.fillRoundRect(x, y, width, height, roundness, roundness);
+        g.fillRoundRect(x - width / 2, y - height / 2, width, height, roundness, roundness);
         g.setFont(new Font("Impact", Font.PLAIN, 10));
         g.setColor(titleColour);
         drawCenteredText(g, title, x + width / 2, y + height / 5);
