@@ -17,7 +17,7 @@ public class Stopwatch {
         elapsed = curr - start;
     }
 
-    public double getElapsed() {
-        return elapsed / 1000.0;
+    public int getElapsed() {
+        return (int) (elapsed / 1000);
     }
 }

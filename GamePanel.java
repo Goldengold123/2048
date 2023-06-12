@@ -61,14 +61,14 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         tiles = new Tiles(BOARD_SIZE, 25, 160, 90);
 
         // Stopwatch / timer
-        timer = new Text(500, 185, "TIMER", 2, false);
+        timer = new Text(500, 185, "TIMER", 2);
         stopwatch = new Stopwatch();
 
         // Score
-        score = new Text(500, 245, "SCORE", 0, true);
+        score = new Text(500, 245, "SCORE", 0);
 
         // Highscore
-        highscore = new Text(600, 240, "HIGHSCORE", 0, true);
+        highscore = new Text(600, 240, "HIGHSCORE", 0);
         try {
             hs = new File("highscore.txt");
             reader = new Scanner(hs);
@@ -101,22 +101,23 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
                     if (play.checkMouse(e.getX(), e.getY())) {
                         state = 1;
                     } else if (instructions.checkMouse(e.getX(), e.getY())) {
-                        state = -1;
+                        state = 2;
                     } else if (quit.checkMouse(e.getX(), e.getY())) {
-
+                        state = -1;
+                        updateHighScore();
+                        System.exit(0);
                     }
 
                 } else if (state == 1) {
                     if (restart.checkMouse(e.getX(), e.getY())) {
                         restart();
-                        // Repaint the panel
-                        repaint();
+                        state = 1;
                     } else if (menu.checkMouse(e.getX(), e.getY())) {
                         restart();
                         state = 0;
-                        repaint();
                     }
                 }
+                // Repaint the panel
                 repaint();
 
             }
@@ -149,9 +150,9 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
             drawMenu(g);
         else if (state == 1)
             drawGame(g);
-        else if (state == -1)
+        else if (state == 2)
             drawInstructions(g);
-        else
+        else if (state == 3)
             drawEnd(g);
     }
 
@@ -236,54 +237,49 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         long now = 0;
 
         while (true) {
-            if (state == 1)
-                gameScreen(lastTime, amountOfTicks, ns, delta, now);
-
             updateHighScore();
-        }
-    }
+            Tiles tmpBoard; // temporary board to verify if user has moved or not (copy and compare array)
+            restart();
+            // Main game loop
+            while (state == 1) {
+                now = System.nanoTime();
+                delta = delta + (now - lastTime) / ns;
+                lastTime = now;
 
-    // Infinite game loop
-    private void gameScreen(long lastTime, double amountOfTicks, double ns, double delta, long now) {
-        Tiles tmpBoard; // temporary board to verify if user has moved or not (copy and compare array)
-        restart();
-        // Main game loop
-        while (state == 1) {
-            now = System.nanoTime();
-            delta = delta + (now - lastTime) / ns;
-            lastTime = now;
-
-            responded = true;
-            if (tiles.won() && !asked) { // if user has gotten win tile and not asked if they want to quit/continue, ask
-                asked = true;
-                System.out.println("hmm.");
-                responded = false;
-                // collect input (must be q or p)
-                while (!responded) {
+                responded = true;
+                if (tiles.won() && !asked) { // if user has gotten win tile and not asked if they want to quit/continue,
+                                             // ask
+                    asked = true;
+                    System.out.println("hmm.");
+                    responded = false;
+                    // collect input (must be q or p)
+                    while (!responded) {
+                    }
                 }
+                responded = false;
+                tiles.fillRandom((Math.random() < 0.75) ? 2 : 4); // fill board with random tile
+                if (!tiles.isAlive()) // check if user still alive (added tile does not kill them)
+                    state = -1 * Math.abs(state);
+                if (state < 0) // if user dead, break out of game loop
+                    break;
+
+                // User move
+                tmpBoard = new Tiles(tiles.getBoard()); // copy array to compare if they actually moved
+                while (!responded) {
+                    responded = !Tiles.sameArray(tiles, tmpBoard); // compare tmpBoard and board to see if actually
+                                                                   // moved
+
+                    stopwatch.update();
+                    timer.value = stopwatch.getElapsed();
+
+                    score.value = tiles.getScore();
+                    high = Math.max(high, tiles.getScore());
+                    highscore.value = high;
+
+                    repaint();
+                }
+                delta--;
             }
-            responded = false;
-            tiles.fillRandom((Math.random() < 0.75) ? 2 : 4); // fill board with random tile
-            if (!tiles.isAlive()) // check if user still alive (added tile does not kill them)
-                state = -1 * Math.abs(state);
-            if (state < 0) // if user dead, break out of game loop
-                break;
-
-            // User move
-            tmpBoard = new Tiles(tiles.getBoard()); // copy array to compare if they actually moved
-            while (!responded) {
-                responded = !Tiles.sameArray(tiles, tmpBoard); // compare tmpBoard and board to see if actually moved
-
-                stopwatch.update();
-                timer.value = stopwatch.getElapsed();
-
-                score.value = tiles.getScore();
-                high = Math.max(high, tiles.getScore());
-                highscore.value = high;
-
-                repaint();
-            }
-            delta--;
         }
     }
 
@@ -292,7 +288,6 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         tiles.restart();
         stopwatch.restart();
         highscore.value = Math.max(high, highscore.value);
-        state = 1;
 
         // Random initial tile
         tiles.fillRandom(2);
