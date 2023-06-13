@@ -42,7 +42,9 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     private TextButton play;
     private TextButton instructions;
     private TextButton quit;
-    private Image musicIcon;
+
+    private Image musicOn;
+    private Image musicOff;
     private ImageButton music;
     private boolean musicToggle = true;
 
@@ -97,9 +99,10 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         quit = new TextButton(GAME_WIDTH / 2, 400, "QUIT");
 
         // Music
-        musicIcon = new ImageIcon("music.png").getImage();
+        musicOn = new ImageIcon("musicOn.png").getImage();
+        musicOff = new ImageIcon("musicOff.png").getImage();
 
-        music = new ImageButton(GAME_WIDTH / 2, 470, musicIcon);
+        music = new ImageButton(GAME_WIDTH / 2, 470, musicOn, musicOff);
 
         // Mouse Click
         addMouseListener(new MouseAdapter() {
@@ -233,6 +236,16 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         }
     }
 
+    public void restart() {
+        // Reset game variables
+        tiles.restart();
+        stopwatch.restart();
+        highscore.value = Math.max(high, highscore.value);
+
+        // Random initial tile
+        tiles.fillRandom(2);
+    }
+
     // run() method is what makes the game continue running without end. It calls
     // other methods to move objects, check for collision, and update the screen
     public void run() {
@@ -291,16 +304,6 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
                 delta--;
             }
         }
-    }
-
-    public void restart() {
-        // Reset game variables
-        tiles.restart();
-        stopwatch.restart();
-        highscore.value = Math.max(high, highscore.value);
-
-        // Random initial tile
-        tiles.fillRandom(2);
     }
 
     // if a key is pressed, send to tiles class to process
