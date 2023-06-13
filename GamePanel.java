@@ -273,7 +273,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         updateHighScore();
 
         // Random initial tile
-        tiles.fillRandom(2);
+        tiles.fillRandom(1);
     }
 
     // run() method is what makes the game continue running without end. It calls
@@ -312,7 +312,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
                     }
                 }
                 responded = false;
-                tiles.fillRandom((Math.random() < 0.9) ? 2 : 4); // fill board with random tile
+                tiles.fillRandom((Math.random() < 0.9) ? 1 : 2); // fill board with random tile
                 if (!tiles.isAlive()) // check if user still alive (added tile does not kill them)
                     state = -1 * Math.abs(state);
                 if (state < 0) // if user dead, break out of game loop

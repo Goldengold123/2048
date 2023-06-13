@@ -33,7 +33,7 @@ public class Tiles {
     private int[][] board;
     private int score;
     private boolean win;
-    private static int winScore = 64;
+    private static int winScore = 6;
 
     public int TILE_SIZE;
 
@@ -114,9 +114,9 @@ public class Tiles {
         // PART 2 - combine adjacent tiles if they are identical
         for (int i = 0; i + 1 < cnt; i++) {
             if (arr[i] == arr[i + 1]) { // if adjacent tiles are the same, combine them
-                arr[i] *= 2; // set one tile to combined value
+                arr[i] += 1; // set one tile to combined value
                 arr[i + 1] = 0; // set other tile to 0 (empty tile)
-                s += arr[i];
+                s += 1 << arr[i];
             }
             if (arr[i] == winScore) // if winScore obtained, set win to true
                 win = true;
@@ -282,6 +282,8 @@ public class Tiles {
             up();
         if (e.getKeyCode() == KeyEvent.VK_DOWN)
             down();
+        if (e.getKeyCode() == KeyEvent.VK_9)
+            board[0][0] = 17;
         print();
     }
 
@@ -307,12 +309,12 @@ public class Tiles {
 
     // draws the tile to the screen
     public static void drawTile(Graphics g, int n, int x, int y, int SIZE) {
-        g.setColor(colours[(n == 0) ? 0 : Math.min(12, (int) (Math.log10(n) / Math.log10(2)))]);
+        g.setColor(colours[Math.min(12, n)]);
         g.fillRoundRect(x, y, SIZE, SIZE, SIZE / 3, SIZE / 3);
-        g.setColor((n <= 4) ? new Color(119, 110, 101) : new Color(249, 246, 242));
+        g.setColor((n <= 2) ? new Color(119, 110, 101) : new Color(249, 246, 242));
         g.setFont(new Font("Impact", Font.PLAIN, 32));
         if (n != 0)
-            drawCenteredText(g, n + "", x + SIZE / 2, y + SIZE / 2);
+            drawCenteredText(g, (1 << n) + "", x + SIZE / 2, y + SIZE / 2);
     }
 
     // called frequently from the GamePanel class
