@@ -8,9 +8,7 @@
  */
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.Scanner;
 import java.awt.*;
 import java.awt.event.*;
@@ -73,9 +71,9 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
             hs = new File("highscore.txt");
             reader = new Scanner(hs);
             high = Integer.parseInt(reader.nextLine());
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        } catch (Exception e) {
+            high = 0;
+            updateHighScore();
         }
         highscore.value = high;
 
@@ -97,6 +95,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         // Mouse Click
         addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
+                updateHighScore();
                 if (state == 0) {
                     if (play.checkMouse(e.getX(), e.getY())) {
                         state = 1;
@@ -104,7 +103,6 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
                         state = 2;
                     } else if (quit.checkMouse(e.getX(), e.getY())) {
                         state = -1;
-                        updateHighScore();
                         System.exit(0);
                     }
 
@@ -213,13 +211,12 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
     private void updateHighScore() {
         PrintWriter writer;
-        high = Math.max(high, tiles.getScore());
+        high = Math.max(Math.max(high, highscore.value), tiles.getScore());
         try {
             writer = new PrintWriter("highscore.txt", "UTF-8");
             writer.println(high);
             writer.close();
-        } catch (FileNotFoundException | UnsupportedEncodingException e) {
-            // TODO Auto-generated catch block
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
