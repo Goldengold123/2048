@@ -33,7 +33,7 @@ public class Tiles {
     private int[][] board;
     private int score;
     private boolean win;
-    private static int winScore = 2048;
+    private static int winScore = 64;
 
     public int TILE_SIZE;
 

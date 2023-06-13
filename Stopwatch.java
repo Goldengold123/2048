@@ -8,6 +8,10 @@ public class Stopwatch {
         start = System.currentTimeMillis();
     }
 
+    public void override(double t) {
+        elapsed = t;
+    }
+
     public void restart() {
         start = System.currentTimeMillis();
     }

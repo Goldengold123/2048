@@ -54,7 +54,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     private int state = 0;
 
     private boolean responded = false; // has user responded (should new board be printed?)
-    private boolean asked = false; // user has won, have they been asked whether they want to continue or quit?
+    private int ask = 0; // user has won, have they been asked whether they want to continue or quit?
+    // ^ 0 = has not won, 1 = asking, 2 = asked
 
     public GamePanel() {
         File hs;
@@ -223,6 +224,15 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         highscore.draw(g);
         restart.draw(g);
         menu.draw(g);
+        if (ask == 1) {
+            g.setColor(Color.black); // set color to white
+
+            g.setFont(new Font("Impact", Font.PLAIN, 96));
+
+            drawCenteredText(g, "You won!", GAME_WIDTH / 2, 400);
+            g.setFont(new Font("Impact", Font.PLAIN, 18));
+            drawCenteredText(g, "Press 'q' for the quit screen and 'p' to continue playing.", GAME_WIDTH / 2, 450);
+        }
     }
 
     private void drawEnd(Graphics g) {
@@ -256,6 +266,10 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         // Reset game variables
         tiles.restart();
         stopwatch.restart();
+
+        responded = false; // has user responded (should new board be printed?)
+        ask = 0;
+
         updateHighScore();
 
         // Random initial tile
@@ -285,12 +299,16 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
                 lastTime = now;
 
                 responded = true;
-                if (tiles.won() && !asked) { // if user has gotten win tile and not asked if they want to quit/continue,
-                                             // ask
-                    asked = true;
-                    responded = false;
+                if (tiles.won() && ask == 0) { // if user has won and not asked if they want to quit/continue, ask
+                    stopwatch.update();
+                    stopwatch.override(stopwatch.getElapsed());
+                    timer.value = stopwatch.getElapsed();
+                    updateHighScore();
+                    highscore.value = high;
+
+                    ask = 1;
                     // collect input (must be q or p)
-                    while (!responded) {
+                    while (ask != 2) {
                     }
                 }
                 responded = false;
@@ -320,10 +338,21 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     // if a key is pressed, send to tiles class to process
     @Override
     public void keyPressed(KeyEvent e) {
-        Tiles tmpBoard; // temporary board to verify if user has moved or not (copy and compare array)
-        tmpBoard = new Tiles(tiles.getBoard()); // copy array to compare if they actually moved
-        tiles.keyPressed(e);
-        responded = !tiles.sameArray(tmpBoard);
+        if (state == 1) {
+            if (ask == 1) {
+                if (e.getKeyCode() == KeyEvent.VK_P) {
+                    ask = 2;
+                } else if (e.getKeyCode() == KeyEvent.VK_Q) {
+                    ask = 2;
+                    state = 3;
+                }
+            } else {
+                Tiles tmpBoard; // temporary board to verify if user has moved or not (copy and compare array)
+                tmpBoard = new Tiles(tiles.getBoard()); // copy array to compare if they actually moved
+                tiles.keyPressed(e);
+                responded = !tiles.sameArray(tmpBoard);
+            }
+        }
     }
 
     @Override
