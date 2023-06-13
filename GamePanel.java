@@ -30,17 +30,21 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
     private Tiles tiles;
 
-    private Stopwatch stopwatch;
     private Text timer;
+    private Stopwatch stopwatch;
     private Text score;
     private Text highscore;
     private int high = 0;
-    private Button restart;
-    private Button menu;
 
-    private Button play;
-    private Button instructions;
-    private Button quit;
+    private TextButton restart;
+    private TextButton menu;
+
+    private TextButton play;
+    private TextButton instructions;
+    private TextButton quit;
+    private Image musicIcon;
+    private ImageButton music;
+    private boolean musicToggle = true;
 
     // integer to store game state
     // 0 = menu
@@ -78,19 +82,24 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         highscore.value = high;
 
         // Restart
-        restart = new Button(500, 480, "RESTART");
+        restart = new TextButton(500, 480, "RESTART");
 
         // Menu
-        menu = new Button(500, 540, "MENU");
+        menu = new TextButton(500, 540, "MENU");
 
         // Play
-        play = new Button(GAME_WIDTH / 2, 260, "PLAY");
+        play = new TextButton(GAME_WIDTH / 2, 260, "PLAY");
 
         // Instructions
-        instructions = new Button(GAME_WIDTH / 2, 330, "INSTRUCTIONS");
+        instructions = new TextButton(GAME_WIDTH / 2, 330, "INSTRUCTIONS");
 
         // Quit
-        quit = new Button(GAME_WIDTH / 2, 400, "QUIT");
+        quit = new TextButton(GAME_WIDTH / 2, 400, "QUIT");
+
+        // Music
+        musicIcon = new ImageIcon("music.png").getImage();
+
+        music = new ImageButton(GAME_WIDTH / 2, 470, musicIcon);
 
         // Mouse Click
         addMouseListener(new MouseAdapter() {
@@ -104,6 +113,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
                     } else if (quit.checkMouse(e.getX(), e.getY())) {
                         state = -1;
                         System.exit(0);
+                    } else if (music.checkMouse(e.getX(), e.getY())) {
+                        musicToggle = !musicToggle;
                     }
 
                 } else if (state == 1) {
@@ -172,6 +183,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         play.draw(g);
         instructions.draw(g);
         quit.draw(g);
+        music.draw(g);
     }
 
     private void drawInstructions(Graphics g) {
