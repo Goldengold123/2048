@@ -46,7 +46,6 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     private Image musicOn;
     private Image musicOff;
     private ImageButton music;
-    private boolean musicToggle = true;
 
     // integer to store game state
     // 0 = menu
@@ -102,7 +101,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         musicOn = new ImageIcon("musicOn.png").getImage();
         musicOff = new ImageIcon("musicOff.png").getImage();
 
-        music = new ImageButton(GAME_WIDTH / 2, 470, musicOn, musicOff);
+        music = new ImageButton(GAME_WIDTH / 2 - 5, 490, musicOn, musicOff);
 
         // Mouse Click
         addMouseListener(new MouseAdapter() {
@@ -117,7 +116,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
                         state = -1;
                         System.exit(0);
                     } else if (music.checkMouse(e.getX(), e.getY())) {
-                        musicToggle = !musicToggle;
+                        music.toggle();
                     }
 
                 } else if (state == 1) {
@@ -158,6 +157,9 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
     // call the draw methods in each class to update positions as things move
     private void draw(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+
         if (state == 0)
             drawTitle(g);
         else if (state == 1)
@@ -190,10 +192,24 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     }
 
     private void drawInstructions(Graphics g) {
+        String[] lines = {
+                "This is a sliding puzzle game where you use the",
+                "arrow keys to slide the tiles in the desired direction.",
+                "If two tiles with the same number are adjacent to each",
+                "other and slide in that direction, they will combine to",
+                "form a single tile with double the initial number.",
+                "",
+                "If you get the tile 2048, you win!",
+                "You will also be given the option to exit or continue.",
+                "",
+                "Good luck!"
+        };
         g.setFont(new Font("Impact", Font.PLAIN, 120));
         drawCenteredText(g, "2048", GAME_WIDTH / 2, 240);
-        g.setFont(new Font("Impact", Font.PLAIN, 32));
-        drawCenteredText(g, "asdkfasd", GAME_WIDTH / 2, 250);
+        g.setFont(new Font("Impact", Font.PLAIN, 18));
+        for (int i = 0; i < lines.length; i++) {
+            drawCenteredText(g, lines[i], GAME_WIDTH / 2, 250 + i * 20);
+        }
     }
 
     private void drawGame(Graphics g) {
@@ -240,7 +256,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         // Reset game variables
         tiles.restart();
         stopwatch.restart();
-        highscore.value = Math.max(high, highscore.value);
+        updateHighScore();
 
         // Random initial tile
         tiles.fillRandom(2);
@@ -261,7 +277,6 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
         while (true) {
             updateHighScore();
-            Tiles tmpBoard; // temporary board to verify if user has moved or not (copy and compare array)
             restart();
             // Main game loop
             while (state == 1) {
@@ -273,7 +288,6 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
                 if (tiles.won() && !asked) { // if user has gotten win tile and not asked if they want to quit/continue,
                                              // ask
                     asked = true;
-                    System.out.println("hmm.");
                     responded = false;
                     // collect input (must be q or p)
                     while (!responded) {
@@ -287,11 +301,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
                     break;
 
                 // User move
-                tmpBoard = new Tiles(tiles.getBoard()); // copy array to compare if they actually moved
-                while (!responded) {
-                    responded = !Tiles.sameArray(tiles, tmpBoard); // compare tmpBoard and board to see if actually
-                                                                   // moved
-
+                while (!responded) { // compare tmpBoard and board to see if actually
+                                     // moved
                     stopwatch.update();
                     timer.value = stopwatch.getElapsed();
 
@@ -309,7 +320,10 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     // if a key is pressed, send to tiles class to process
     @Override
     public void keyPressed(KeyEvent e) {
+        Tiles tmpBoard; // temporary board to verify if user has moved or not (copy and compare array)
+        tmpBoard = new Tiles(tiles.getBoard()); // copy array to compare if they actually moved
         tiles.keyPressed(e);
+        responded = !tiles.sameArray(tmpBoard);
     }
 
     @Override

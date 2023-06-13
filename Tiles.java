@@ -211,15 +211,14 @@ public class Tiles {
     }
 
     // Method to check if 2 arrays are identical (same elements in the same order).
-    public static boolean sameArray(Tiles tiles1, Tiles tiles2) {
-        int[][] arr1 = tiles1.board;
-        int[][] arr2 = tiles2.board;
+    public boolean sameArray(Tiles tilesCmp) {
+        int[][] arrCmp = tilesCmp.board;
 
-        if (arr1.length != arr2.length || arr1[0].length != arr2[0].length)
+        if (board.length != arrCmp.length || board[0].length != arrCmp[0].length)
             return false;
-        for (int i = 0; i < arr1.length; i++)
-            for (int j = 0; j < arr1[0].length; j++)
-                if (arr1[i][j] != arr2[i][j])
+        for (int i = 0; i < board.length; i++)
+            for (int j = 0; j < board[0].length; j++)
+                if (board[i][j] != arrCmp[i][j])
                     return false;
         return true;
     }
@@ -231,25 +230,25 @@ public class Tiles {
         // Copy the array, slide to left, check if it is the same array
         tmpBoard = new Tiles(board);
         tmpBoard.left();
-        if (!sameArray(this, tmpBoard))
+        if (!sameArray(tmpBoard))
             return true;
 
         // Copy the array, slide to right, check if it is the same array
         tmpBoard = new Tiles(board);
         tmpBoard.right();
-        if (!sameArray(this, tmpBoard))
+        if (!sameArray(tmpBoard))
             return true;
 
         // Copy the array, slide up, check if it is the same array
         tmpBoard = new Tiles(board);
         tmpBoard.up();
-        if (!sameArray(this, tmpBoard))
+        if (!sameArray(tmpBoard))
             return true;
 
         // Copy the array, slide down, check if it is the same array
         tmpBoard = new Tiles(board);
         tmpBoard.down();
-        if (!sameArray(this, tmpBoard))
+        if (!sameArray(tmpBoard))
             return true;
 
         // If no value returned yet, no possible moves -> return false
@@ -274,6 +273,7 @@ public class Tiles {
     // called from GamePanel when any keyboard input is detected
     // slides the tiles in the direction if arrow keys pressed
     public void keyPressed(KeyEvent e) {
+        print();
         if (e.getKeyCode() == KeyEvent.VK_LEFT)
             left();
         if (e.getKeyCode() == KeyEvent.VK_RIGHT)
@@ -282,6 +282,17 @@ public class Tiles {
             up();
         if (e.getKeyCode() == KeyEvent.VK_DOWN)
             down();
+        print();
+    }
+
+    public void print() {
+        for (int[] l : board) {
+            for (int c : l) {
+                System.out.print(c + " ");
+            }
+            System.out.println();
+        }
+        System.out.println();
     }
 
     // draws centered text

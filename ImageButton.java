@@ -13,6 +13,10 @@ public class ImageButton extends Button {
         toggle = true;
     }
 
+    public void toggle() {
+        toggle = !toggle;
+    }
+
     // called frequently from the GamePanel class
     // draws the current location of the ball to the screen
     public void draw(Graphics g) {
