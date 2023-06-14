@@ -57,7 +57,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     private Image musicOn;
     private Image musicOff;
     private ImageButton music;
-    private static Clip musicClip;
+    private Clip musicClip;
     private long musicClipTime = 0;
 
     // integer to store game state
@@ -308,6 +308,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     // method for playing sound
     private void playSound(Clip sound) {
         sound.setMicrosecondPosition(musicClipTime);
+        sound.loop(Clip.LOOP_CONTINUOUSLY);
         sound.start(); // start the sound
     }
 
@@ -331,7 +332,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     }
 
     // method to restart - game variables, ask variables, update high score
-    public void restart() {
+    private void restart() {
         // Reset game variables
         tiles.restart();
         stopwatch.restart();
