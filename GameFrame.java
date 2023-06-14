@@ -1,8 +1,8 @@
 /*
  * Author: Grace Pu
  * Date: May 30
- * Description: This program simulates a minimal working text version of the puzzle game, 2048. 
- * It serves as the ALPHA PROGRAM of the ICS4U final culminating project.
+ * Description: This program simulates a working version of the puzzle game, 2048. 
+ * It serves as the BETA PROGRAM of the ICS4U final culminating project.
  * GameFrame class establishes the frame (window) for the game.
  * It is a child of JFrame because JFrame manages frames.
  * Runs the constructor in GamePanel class.

@@ -3,7 +3,7 @@
  * Date: May 30
  * Description: 
  * Tiles class defines behaviours for the tiles
- * Part of the ALPHA PROGRAM of the ICS4U final culminating project.
+ * Part of the BETA PROGRAM of the ICS4U final culminating project.
  */
 
 import java.awt.*;
