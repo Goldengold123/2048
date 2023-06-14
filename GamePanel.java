@@ -173,8 +173,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         gameThread.start();
     }
 
-    // Override paint method
-    @Override
+    // Paint method
     public void paint(Graphics g) {
         // we are using "double buffering here" - if we draw images directly onto the
         // screen, it takes time and the human eye can actually notice flashes of lag as
@@ -266,14 +265,16 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         menu.draw(g);
 
         if (ask == 1) { // if user has won and needs to be asked to quit/continue
-            g.setColor(Color.black); // set color to white
+            g.setColor(Color.black); // set color to black
 
             g.setFont(new Font("Impact", Font.PLAIN, 96));
 
             drawCenteredText(g, "You won!", GAME_WIDTH / 2, 400);
             g.setFont(new Font("Impact", Font.PLAIN, 18));
             drawCenteredText(g, "Press 'q' for the quit screen and 'p' to continue playing.", GAME_WIDTH / 2, 450);
+
         }
+
     }
 
     // method to draw end screen
@@ -380,12 +381,13 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
                     ask = 1;
                     // collect input (must be q or p)
                     while (ask != 2) {
+                        System.out.println("hi");
                     }
                 }
                 responded = false;
                 tiles.fillRandom((Math.random() < 0.9) ? 1 : 2); // fill board with random tile
                 if (!tiles.isAlive()) // check if user still alive (added tile does not kill them)
-                    state = -1 * Math.abs(state);
+                    state = 3;
 
                 // User move
                 while (!responded) { // compare tmpBoard and board to see if actually
@@ -422,6 +424,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
                 responded = !tiles.sameArray(tmpBoard);
             }
         }
+        repaint();
     }
 
     @Override

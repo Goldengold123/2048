@@ -33,7 +33,7 @@ public class Tiles {
     private int[][] board;
     private int score;
     private boolean win;
-    private static int winScore = 6;
+    private static int winScore = 11;
 
     public int TILE_SIZE;
 
@@ -287,6 +287,7 @@ public class Tiles {
         print();
     }
 
+    // prints the board in the console for debugging purposes
     public void print() {
         for (int[] l : board) {
             for (int c : l) {
