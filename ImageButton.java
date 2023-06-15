@@ -12,16 +12,20 @@ import java.awt.*;
 public class ImageButton extends Button {
 
     // Variable Declaration
-    private Image img; // image for when toggle on
-    private Image img2; // image for when toggle off
+    private Image imgOn; // image for when toggle on
+    private Image imgOnMouse; // image for when toggle on
+    private Image imgOff; // image for when toggle off
+    private Image imgOffMouse; // image for when toggle off
     private boolean toggle; // boolean for toggle
 
     // constructor creates image button at given location with the images for on/off
     // calls upon button constructor
-    public ImageButton(int x, int y, Image i, Image i2) {
-        super(x, y, i.getWidth(null), i.getHeight(null));
-        img = i;
-        img2 = i2;
+    public ImageButton(int x, int y, Image on, Image onMouse, Image off, Image offMouse) {
+        super(x, y, on.getWidth(null), on.getHeight(null));
+        imgOn = on;
+        imgOnMouse = onMouse;
+        imgOff = off;
+        imgOffMouse = offMouse;
         toggle = true;
     }
 
@@ -35,11 +39,18 @@ public class ImageButton extends Button {
     }
 
     // draws the current location of the image button to the screen based on toggle
-    public void draw(Graphics g) {
-        if (toggle) // on
-            g.drawImage(img, x - img.getWidth(null) / 2, y - img.getHeight(null) / 2, null);
-        else // off
-            g.drawImage(img2, x - img2.getWidth(null) / 2, y - img2.getHeight(null) / 2, null);
+    public void draw(Graphics g, int mX, int mY) {
+        if (toggle) { // on
+            if (checkMouse(mX, mY))
+                g.drawImage(imgOnMouse, x - imgOnMouse.getWidth(null) / 2, y - imgOnMouse.getHeight(null) / 2, null);
+            else
+                g.drawImage(imgOn, x - imgOn.getWidth(null) / 2, y - imgOn.getHeight(null) / 2, null);
+        } else { // off
+            if (checkMouse(mX, mY))
+                g.drawImage(imgOffMouse, x - imgOffMouse.getWidth(null) / 2, y - imgOffMouse.getHeight(null) / 2, null);
+            else
+                g.drawImage(imgOff, x - imgOff.getWidth(null) / 2, y - imgOff.getHeight(null) / 2, null);
+        }
     }
 
 }

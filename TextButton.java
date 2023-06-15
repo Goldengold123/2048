@@ -15,6 +15,7 @@ public class TextButton extends Button {
     private String text;
     private static int roundness = 20;
     public static Color colour = new Color(187, 173, 160); // background
+    public static Color colourMouseOver = new Color(166, 147, 130); // background mouseOver
     private static Color textColour = new Color(250, 248, 239); // text
 
     // constructor creates text button at given location with given text
@@ -35,9 +36,12 @@ public class TextButton extends Button {
     }
 
     // draws the current location of the text button to the screen
-    public void draw(Graphics g) {
+    public void draw(Graphics g, int mX, int mY) {
         // background
-        g.setColor(colour);
+        if (checkMouse(mX, mY))
+            g.setColor(colourMouseOver);
+        else
+            g.setColor(colour);
         g.fillRoundRect(x - width / 2, y - height / 2, width, height, roundness, roundness);
 
         // text

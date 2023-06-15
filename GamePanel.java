@@ -26,6 +26,10 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     private static final int GAME_WIDTH = 600;
     private static final int GAME_HEIGHT = 600;
 
+    private Point mouse;
+    private int mX;
+    private int mY;
+
     // graphics related variables
     private Thread gameThread;
     private Image image;
@@ -55,7 +59,9 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
     // music
     private Image musicOn;
+    private Image musicOnMouse;
     private Image musicOff;
+    private Image musicOffMouse;
     private ImageButton music;
     private Clip musicClip;
     private long musicClipTime = 0;
@@ -112,14 +118,16 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         quit = new TextButton(GAME_WIDTH / 2, 400, "QUIT");
 
         // Music -- try catch for robustness
-        musicOn = new ImageIcon("musicOn.png").getImage();
-        musicOff = new ImageIcon("musicOff.png").getImage();
+        musicOn = new ImageIcon("media/musicOn.png").getImage();
+        musicOnMouse = new ImageIcon("media/musicOnMouse.png").getImage();
+        musicOff = new ImageIcon("media/musicOff.png").getImage();
+        musicOffMouse = new ImageIcon("media/musicOffMouse.png").getImage();
 
-        music = new ImageButton(GAME_WIDTH / 2 - 5, 490, musicOn, musicOff);
+        music = new ImageButton(GAME_WIDTH / 2 - 5, 490, musicOn, musicOnMouse, musicOff, musicOffMouse);
 
         try {
             musicClip = AudioSystem.getClip();
-            openSound(musicClip, "music.wav");
+            openSound(musicClip, "media/music.wav");
             playSound(musicClip);
         } catch (Exception e) {
             e.printStackTrace();
@@ -191,15 +199,17 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
 
+        mX = (int) mouse.getX();
+        mY = (int) mouse.getY();
         // calls upon helper methods (cleaner code)
         if (state == 0)
-            drawTitle(g);
+            drawTitle(g, mX, mY);
         else if (state == 1)
-            drawGame(g);
+            drawGame(g, mX, mY);
         else if (state == 2)
-            drawInstructions(g);
+            drawInstructions(g, mX, mY);
         else if (state == 3)
-            drawEnd(g);
+            drawEnd(g, mX, mY);
     }
 
     // draws centered text based on string and (x,y) center point
@@ -212,20 +222,20 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     }
 
     // method to draw title screen
-    private void drawTitle(Graphics g) {
+    private void drawTitle(Graphics g, int mX, int mY) {
         g.setFont(new Font("Impact", Font.PLAIN, 120));
         drawCenteredText(g, "2048", GAME_WIDTH / 2, 240);
         highscore.x = 520;
         highscore.y = 120;
         highscore.draw(g);
-        play.draw(g);
-        instructions.draw(g);
-        quit.draw(g);
-        music.draw(g);
+        play.draw(g, mX, mY);
+        instructions.draw(g, mX, mY);
+        quit.draw(g, mX, mY);
+        music.draw(g, mX, mY);
     }
 
     // method to draw instructions screen
-    private void drawInstructions(Graphics g) {
+    private void drawInstructions(Graphics g, int mX, int mY) {
         String[] lines = {
                 "This is a sliding puzzle game where you use the",
                 "arrow keys to slide the tiles in the desired direction.",
@@ -246,11 +256,11 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         }
         menu.x = GAME_WIDTH / 2;
         menu.y = 500;
-        menu.draw(g);
+        menu.draw(g, mX, mY);
     }
 
     // method to draw game screen
-    private void drawGame(Graphics g) {
+    private void drawGame(Graphics g, int mX, int mY) {
         g.setFont(new Font("Impact", Font.PLAIN, 96));
         drawCenteredText(g, "2048", GAME_WIDTH / 2, 180);
         tiles.draw(g);
@@ -259,10 +269,10 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         highscore.x = 500;
         highscore.y = 305;
         highscore.draw(g);
-        restart.draw(g);
+        restart.draw(g, mX, mY);
         menu.x = 500;
         menu.y = 540;
-        menu.draw(g);
+        menu.draw(g, mX, mY);
 
         if (ask == 1) { // if user has won and needs to be asked to quit/continue
             g.setColor(Color.black); // set color to black
@@ -278,7 +288,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     }
 
     // method to draw end screen
-    private void drawEnd(Graphics g) {
+    private void drawEnd(Graphics g, int mX, int mY) {
         g.setFont(new Font("Impact", Font.PLAIN, 120));
         drawCenteredText(g, "2048", GAME_WIDTH / 2, 240);
         g.setFont(new Font("Impact", Font.PLAIN, 32));
@@ -294,7 +304,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
         menu.x = GAME_WIDTH / 2;
         menu.y = 500;
-        menu.draw(g);
+        menu.draw(g, mX, mY);
     }
 
     // method for opening sound based on path
@@ -347,6 +357,20 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         tiles.fillRandom(1);
     }
 
+    public Point subtract(Point a, Point b) {
+        return new Point((int) (a.getX() - b.getX()), (int) (a.getY() - b.getY()));
+    }
+
+    public Point getMousePosition() {
+        Point p;
+        try {
+            p = subtract(MouseInfo.getPointerInfo().getLocation(), getLocationOnScreen());
+        } catch (Exception e) {
+            p = new Point(0, 0);
+        }
+        return p;
+    }
+
     // run() method is what makes the game continue running without end. It calls
     // other methods to move objects, check for collision, and update the screen
     @Override
@@ -361,17 +385,20 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         double delta = 0;
         long now = 0;
 
+        restart();
+
+        // Main game loop
         while (true) {
             updateHighScore();
-            restart();
-            // Main game loop
-            while (state == 1) {
-                now = System.nanoTime();
-                delta = delta + (now - lastTime) / ns;
-                lastTime = now;
-
-                responded = true;
-                if (tiles.won() && ask == 0) { // if user has won and not asked if they want to quit/continue, ask
+            now = System.nanoTime();
+            delta = delta + (now - lastTime) / ns;
+            lastTime = now;
+            if (state != 1) {
+                restart();
+            }
+            if (state == 1) {
+                // if user won and has not been asked if they want to quit/continue, ask
+                if (tiles.won() && ask == 0) {
                     stopwatch.update();
                     stopwatch.override(stopwatch.getElapsed());
                     timer.value = stopwatch.getElapsed();
@@ -384,25 +411,32 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
                         System.out.println("hi");
                     }
                 }
+
                 responded = false;
+
                 tiles.fillRandom((Math.random() < 0.9) ? 1 : 2); // fill board with random tile
-                if (!tiles.isAlive()) // check if user still alive (added tile does not kill them)
+                if (!tiles.isAlive()) // check if user still alive (added tile)
                     state = 3;
 
                 // User move
-                while (!responded) { // compare tmpBoard and board to see if actually
-                                     // moved
+                while (!responded) { // compare tmpBoard and board to see if actually moved
                     stopwatch.update();
                     timer.value = stopwatch.getElapsed();
 
                     score.value = tiles.getScore();
                     updateHighScore();
                     highscore.value = high;
-
+                    // Mouse position for mouseover effects
+                    mouse = getMousePosition();
                     repaint();
+
                 }
-                delta--;
             }
+            // Mouse position for mouseover effects
+            mouse = getMousePosition();
+            repaint();
+
+            delta--;
         }
     }
 
@@ -423,6 +457,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
                 tiles.keyPressed(e);
                 responded = !tiles.sameArray(tmpBoard);
             }
+            if (!tiles.isAlive()) // check if user still alive (added tile)
+                state = 3;
         }
         repaint();
     }

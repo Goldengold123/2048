@@ -18,6 +18,7 @@ public class Button extends Rectangle {
 
     // method to check if the button is clicked
     public boolean checkMouse(int a, int b) {
-        return (x - width / 2 <= a && a <= x + width / 2 && y - width / 2 <= b && b <= y + height / 2);
+        System.out.println(a + " " + b + " " + x + " " + y + " " + width + " " + height);
+        return (x - width / 2 <= a && a <= x + width / 2 && y - height / 2 <= b && b <= y + height / 2);
     }
 }
