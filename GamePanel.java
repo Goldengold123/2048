@@ -30,6 +30,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     private int mX;
     private int mY;
 
+    private Color messageColor = new Color(238, 198, 202, 210);
+
     // graphics related variables
     private Thread gameThread;
     private Image image;
@@ -74,6 +76,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
     private int ask = 0; // user has won, have they been asked whether they want to continue or quit?
     // ^ 0 = has not won, 1 = asking, 2 = asked
+
+    private boolean toggleControlHint = false;
 
     public GamePanel() {
         // high score file and reader
@@ -223,6 +227,11 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         g.drawString(s, newX, newY);
     }
 
+    private void drawMessageRectangle(Graphics g, Color c, int x, int y, int w, int h) {
+        g.setColor(c);
+        g.fillRoundRect(x - 50 - w / 2, y - 50 - h / 2, w + 100, h + 100, 20, 20);
+    }
+
     // method to draw title screen
     private void drawTitle(Graphics g, int mX, int mY) {
         g.setFont(new Font("Impact", Font.PLAIN, 120));
@@ -277,14 +286,23 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         menu.draw(g, mX, mY);
 
         if (ask == 1) { // if user has won and needs to be asked to quit/continue
+            drawMessageRectangle(g, messageColor, GAME_WIDTH / 2, 350, 350, 120);
             g.setColor(Color.black); // set color to black
-
             g.setFont(new Font("Impact", Font.PLAIN, 96));
-
             drawCenteredText(g, "You won!", GAME_WIDTH / 2, 400);
             g.setFont(new Font("Impact", Font.PLAIN, 18));
-            drawCenteredText(g, "Press 'q' for the quit screen and 'p' to continue playing.", GAME_WIDTH / 2, 450);
+            drawCenteredText(g, "Press Q for the quit screen and P to continue playing.", GAME_WIDTH / 2, 450);
+        }
 
+        if (toggleControlHint) {
+            drawMessageRectangle(g, messageColor, GAME_WIDTH / 2, 360, 420, 150);
+            g.setColor(Color.black); // set color to black
+            g.setFont(new Font("Impact", Font.PLAIN, 96));
+            drawCenteredText(g, "Control Hints", GAME_WIDTH / 2, 400);
+            g.setFont(new Font("Impact", Font.PLAIN, 18));
+            drawCenteredText(g, "Arrow keys or WASD to slide tiles", GAME_WIDTH / 2, 450);
+            g.setColor(Color.gray);
+            drawCenteredText(g, "CHEAT - 9 to generate 1024 in upper left corner", GAME_WIDTH / 2, 480);
         }
 
     }
@@ -468,6 +486,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
                 responded = ((!tiles.sameArray(tmpBoard)));
             }
         }
+        if (e.getKeyCode() == KeyEvent.VK_H)
+            toggleControlHint = true;
         repaint();
     }
 
@@ -478,6 +498,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_H)
+            toggleControlHint = false;
     }
 
 }
