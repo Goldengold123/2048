@@ -136,39 +136,41 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         // Mouse Click
         addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
-                updateHighScore(); // change high score whenever mouse pressed to keep everything updated
-                if (state == 0) { // menu screen -> check menu buttons
-                    if (play.checkMouse(e.getX(), e.getY())) {
-                        state = 1;
-                    } else if (instructions.checkMouse(e.getX(), e.getY())) {
-                        state = 2;
-                    } else if (quit.checkMouse(e.getX(), e.getY())) {
-                        state = -1;
-                        System.exit(0);
-                    } else if (music.checkMouse(e.getX(), e.getY())) {
-                        music.toggle();
-                        if (music.getValue())
-                            playSound(musicClip);
-                        else
-                            stopSound(musicClip);
+                if (ask != 1) {
+                    updateHighScore(); // change high score whenever mouse pressed to keep everything updated
+                    if (state == 0) { // menu screen -> check menu buttons
+                        if (play.checkMouse(e.getX(), e.getY())) {
+                            state = 1;
+                        } else if (instructions.checkMouse(e.getX(), e.getY())) {
+                            state = 2;
+                        } else if (quit.checkMouse(e.getX(), e.getY())) {
+                            state = -1;
+                            System.exit(0);
+                        } else if (music.checkMouse(e.getX(), e.getY())) {
+                            music.toggle();
+                            if (music.getValue())
+                                playSound(musicClip);
+                            else
+                                stopSound(musicClip);
+                        }
+                    } else if (state == 1) { // game screen -> check game buttons
+                        if (restart.checkMouse(e.getX(), e.getY())) {
+                            restart();
+                            state = 1;
+                        } else if (menu.checkMouse(e.getX(), e.getY())) {
+                            restart();
+                            state = 0;
+                        }
+                    } else if (state == 2 || state == 3) { // instructions screen -> check instruction buttons
+                        if (menu.checkMouse(e.getX(), e.getY())) {
+                            restart();
+                            state = 0;
+                        }
                     }
-                } else if (state == 1) { // game screen -> check game buttons
-                    if (restart.checkMouse(e.getX(), e.getY())) {
-                        restart();
-                        state = 1;
-                    } else if (menu.checkMouse(e.getX(), e.getY())) {
-                        restart();
-                        state = 0;
-                    }
-                } else if (state == 2 || state == 3) { // instructions screen -> check instruction buttons
-                    if (menu.checkMouse(e.getX(), e.getY())) {
-                        restart();
-                        state = 0;
-                    }
-                }
 
-                // Repaint the panel after mouse click to keep updated
-                repaint();
+                    // Repaint the panel after mouse click to keep updated
+                    repaint();
+                }
             }
         });
 
@@ -393,7 +395,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
             now = System.nanoTime();
             delta = delta + (now - lastTime) / ns;
             lastTime = now;
-            if (state != 1) {
+            if (state == 0) {
                 restart();
             }
             if (state == 1) {
@@ -408,15 +410,17 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
                     ask = 1;
                     // collect input (must be q or p)
                     while (ask != 2) {
-                        System.out.println("hi");
                     }
                 }
 
                 responded = false;
 
                 tiles.fillRandom((Math.random() < 0.9) ? 1 : 2); // fill board with random tile
-                if (!tiles.isAlive()) // check if user still alive (added tile)
+
+                if (!tiles.isAlive()) {// check if user still alive (added tile)
                     state = 3;
+                    continue;
+                }
 
                 // User move
                 while (!responded) { // compare tmpBoard and board to see if actually moved
@@ -429,7 +433,11 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
                     // Mouse position for mouseover effects
                     mouse = getMousePosition();
                     repaint();
+                }
 
+                if (!tiles.isAlive()) {// check if user still alive (added tile)
+                    state = 3;
+                    continue;
                 }
             }
             // Mouse position for mouseover effects
@@ -451,14 +459,14 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
                     ask = 2;
                     state = 3;
                 }
-            } else {
+            }
+
+            else {
                 Tiles tmpBoard; // temporary board to verify if user has moved or not (copy and compare array)
                 tmpBoard = new Tiles(tiles.getBoard()); // copy array to compare if they actually moved
                 tiles.keyPressed(e);
-                responded = !tiles.sameArray(tmpBoard);
+                responded = ((!tiles.sameArray(tmpBoard)));
             }
-            if (!tiles.isAlive()) // check if user still alive (added tile)
-                state = 3;
         }
         repaint();
     }

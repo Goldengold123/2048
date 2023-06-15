@@ -273,29 +273,16 @@ public class Tiles {
     // called from GamePanel when any keyboard input is detected
     // slides the tiles in the direction if arrow keys pressed
     public void keyPressed(KeyEvent e) {
-        print();
-        if (e.getKeyCode() == KeyEvent.VK_LEFT)
+        if (e.getKeyCode() == KeyEvent.VK_LEFT || e.getKeyCode() == KeyEvent.VK_A)
             left();
-        if (e.getKeyCode() == KeyEvent.VK_RIGHT)
+        if (e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_D)
             right();
-        if (e.getKeyCode() == KeyEvent.VK_UP)
+        if (e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_W)
             up();
-        if (e.getKeyCode() == KeyEvent.VK_DOWN)
+        if (e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_S)
             down();
         if (e.getKeyCode() == KeyEvent.VK_9)
-            board[0][0] = 17;
-        print();
-    }
-
-    // prints the board in the console for debugging purposes
-    public void print() {
-        for (int[] l : board) {
-            for (int c : l) {
-                System.out.print(c + " ");
-            }
-            System.out.println();
-        }
-        System.out.println();
+            board[0][0] = 10;
     }
 
     // draws centered text
