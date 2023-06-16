@@ -131,7 +131,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
         try {
             musicClip = AudioSystem.getClip();
-            openSound(musicClip, "media/music.wav");
+            openSound(musicClip, "media/inTheHallOfTheMountainKing.wav");
             playSound(musicClip);
         } catch (Exception e) {
             e.printStackTrace();
@@ -314,13 +314,15 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         g.setFont(new Font("Impact", Font.PLAIN, 32));
 
         // Basic end conditions
-        if (tiles.won()) // user has won
-            drawCenteredText(g, "Win", GAME_WIDTH / 2, 250);
-
-        else // user has lost
-            drawCenteredText(g, "Dead", GAME_WIDTH / 2, 250);
-
-        drawCenteredText(g, "Score " + tiles.getScore(), GAME_WIDTH / 2, 300); // score
+        if (tiles.won()) { // user has won
+            drawCenteredText(g, "Congratulations!", GAME_WIDTH / 2, 250);
+            drawCenteredText(g, "You reached the tile 2048!", GAME_WIDTH / 2, 300);
+        } else { // user has lost
+            drawCenteredText(g, "Tragic.", GAME_WIDTH / 2, 250);
+            drawCenteredText(g, "You did not reach the tile 2048...", GAME_WIDTH / 2, 300);
+        }
+        drawCenteredText(g, "Final Score: " + tiles.getScore(), GAME_WIDTH / 2, 350); // score
+        drawCenteredText(g, "Highest Tile attained: " + tiles.getMaxTile(), GAME_WIDTH / 2, 400); // score
 
         menu.x = GAME_WIDTH / 2;
         menu.y = 500;

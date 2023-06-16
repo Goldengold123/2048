@@ -270,6 +270,14 @@ public class Tiles {
         return win;
     }
 
+    public int getMaxTile() {
+        int m = 0;
+        for (int[] l : board)
+            for (int c : l)
+                m = Math.max(m, c);
+        return ((m == 0) ? 0 : (1 << m));
+    }
+
     // called from GamePanel when any keyboard input is detected
     // slides the tiles in the direction if arrow keys pressed
     public void keyPressed(KeyEvent e) {
