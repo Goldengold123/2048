@@ -11,6 +11,9 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.util.Scanner;
 
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -61,7 +64,9 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     private Image musicOnMouse;
     private Image musicOff;
     private Image musicOffMouse;
-    private Music music;
+    private ImageButton music;
+    private Clip musicClip;
+    private long musicClipTime = 0;
 
     // integer to store game state
     // 0 = menu, 1 = game, 2 = end
@@ -117,14 +122,20 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         quit = new TextButton(GAME_WIDTH / 2, 400, "QUIT");
 
         // Music -- try catch for robustness
-        musicOn = new ImageIcon("images/musicOn.png").getImage();
-        musicOnMouse = new ImageIcon("images/musicOnMouse.png").getImage();
-        musicOff = new ImageIcon("images/musicOff.png").getImage();
-        musicOffMouse = new ImageIcon("images/musicOffMouse.png").getImage();
+        musicOn = new ImageIcon("media/musicOn.png").getImage();
+        musicOnMouse = new ImageIcon("media/musicOnMouse.png").getImage();
+        musicOff = new ImageIcon("media/musicOff.png").getImage();
+        musicOffMouse = new ImageIcon("media/musicOffMouse.png").getImage();
 
-        music = new Music(GAME_WIDTH / 2 - 5, 490, musicOn, musicOnMouse, musicOff, musicOffMouse);
+        music = new ImageButton(GAME_WIDTH / 2 - 5, 490, musicOn, musicOnMouse, musicOff, musicOffMouse);
 
-        music.load();
+        try {
+            musicClip = AudioSystem.getClip();
+            openSound(musicClip, "media/inTheHallOfTheMountainKing.wav");
+            playSound(musicClip);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // Mouse Click
         addMouseListener(new MouseAdapter() {
@@ -141,7 +152,10 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
                             System.exit(0);
                         } else if (music.checkMouse(e.getX(), e.getY())) {
                             music.toggle();
-                            music.toggleUpdate();
+                            if (music.getValue())
+                                playSound(musicClip);
+                            else
+                                stopSound(musicClip);
                         }
                     } else if (state == 1) { // game screen -> check game buttons
                         if (restart.checkMouse(e.getX(), e.getY())) {
@@ -315,6 +329,28 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         menu.draw(g, mX, mY);
     }
 
+    // method for opening sound based on path
+    private void openSound(Clip sound, String path) {
+        try { // try to load the sound
+            sound.open(AudioSystem.getAudioInputStream(new File(path)));
+        } catch (Exception e) { // exception
+            e.printStackTrace();
+        }
+    }
+
+    // method for playing sound
+    private void playSound(Clip sound) {
+        sound.setMicrosecondPosition(musicClipTime);
+        sound.loop(Clip.LOOP_CONTINUOUSLY);
+        sound.start(); // start the sound
+    }
+
+    // method for playing sound
+    private void stopSound(Clip sound) {
+        musicClipTime = sound.getMicrosecondPosition();
+        sound.stop(); // start the sound
+    }
+
     // method to update high score
     private void updateHighScore() {
         PrintWriter writer;
@@ -454,12 +490,6 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         }
         if (e.getKeyCode() == KeyEvent.VK_H)
             toggleControlHint = true;
-        try {
-            music.update(tiles.getMaxTile());
-        } catch (InterruptedException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
         repaint();
     }
 
