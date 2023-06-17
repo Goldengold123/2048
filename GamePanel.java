@@ -131,7 +131,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
         try {
             musicClip = AudioSystem.getClip();
-            openSound(musicClip, "media/inTheHallOfTheMountainKing.wav");
+            openSound(musicClip, "media/music.wav");
             playSound(musicClip);
         } catch (Exception e) {
             e.printStackTrace();
