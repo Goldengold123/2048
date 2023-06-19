@@ -2,7 +2,7 @@
  * Author: Grace Pu
  * Date: June 12
  * Description: This program simulates a working version of the puzzle game, 2048. 
- * It serves as the BETA PROGRAM of the ICS4U final culminating project.
+ * It serves as the FINAL PROGRAM of the ICS4U final culminating project.
  * TextButton class defines behaviours for the buttons with text labels (e.g. play, menu buttons).
  * It is a child of Button because the Button class defines behaviours for the buttons in general.
  */

@@ -2,7 +2,7 @@
  * Author: Grace Pu
  * Date: June 12
  * Description: This program simulates a working version of the puzzle game, 2048. 
- * It serves as the BETA PROGRAM of the ICS4U final culminating project.
+ * It serves as the FINAL PROGRAM of the ICS4U final culminating project.
  * ImageButton class defines behaviours for the buttons with image icons (e.g. music button).
  * It is a child of Button because the Button class defines behaviours for the buttons in general.
  */
@@ -34,21 +34,22 @@ public class ImageButton extends Button {
         toggle = !toggle;
     }
 
+    // method to get value of toggle (private variable)
     public boolean getValue() {
         return toggle;
     }
 
-    // draws the current location of the image button to the screen based on toggle
+    // draws image button at location on the screen based on toggle and checkMouse
     public void draw(Graphics g, int mX, int mY) {
         if (toggle) { // on
-            if (checkMouse(mX, mY))
+            if (checkMouse(mX, mY)) // clicked
                 g.drawImage(imgOnMouse, x - imgOnMouse.getWidth(null) / 2, y - imgOnMouse.getHeight(null) / 2, null);
-            else
+            else // not clicked
                 g.drawImage(imgOn, x - imgOn.getWidth(null) / 2, y - imgOn.getHeight(null) / 2, null);
         } else { // off
-            if (checkMouse(mX, mY))
+            if (checkMouse(mX, mY)) // clicked
                 g.drawImage(imgOffMouse, x - imgOffMouse.getWidth(null) / 2, y - imgOffMouse.getHeight(null) / 2, null);
-            else
+            else // not clicked
                 g.drawImage(imgOff, x - imgOff.getWidth(null) / 2, y - imgOff.getHeight(null) / 2, null);
         }
     }

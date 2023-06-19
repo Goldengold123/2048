@@ -3,7 +3,7 @@
  * Date: May 30
  * Description: 
  * Tiles class defines behaviours for the tiles
- * Part of the BETA PROGRAM of the ICS4U final culminating project.
+ * Part of the FINAL PROGRAM of the ICS4U final culminating project.
  */
 
 import java.awt.*;
@@ -30,13 +30,14 @@ public class Tiles {
             new Color(60, 58, 50)
     };
 
-    private int[][] board;
-    private int score;
-    private boolean win;
-    private static int winScore = 11;
+    private int[][] board; // board values array
+    private int score; // score
+    private boolean win; // has user reached tile 2^winScore
+    private static int winScore = 11; // winScore
 
-    public int TILE_SIZE;
+    public int TILE_SIZE; // size of tile for drawing
 
+    // top right corner for drawing
     private int startX;
     private int startY;
 
@@ -326,4 +327,5 @@ public class Tiles {
             }
         }
     }
+
 }

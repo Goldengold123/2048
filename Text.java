@@ -2,7 +2,7 @@
  * Author: Grace Pu
  * Date: June 9
  * Description: This program simulates a working version of the puzzle game, 2048. 
- * It serves as the BETA PROGRAM of the ICS4U final culminating project.
+ * It serves as the FINAL PROGRAM of the ICS4U final culminating project.
  * Text class defines behaviours for the text objects with varying values.
  * It is a child of Rectangle because it is a rectangle (mainly used in drawing).
  */
